@@ -20,7 +20,7 @@ SIRF defines abstractions on the following points as:
 
 ```asm
 extern @printf
-glob @main
+global @main
 
 data .fmt: "%s: %d\0"
 
