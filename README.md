@@ -18,24 +18,27 @@ SIRF defines abstractions on the following points as:
 
 # Examples
 
-```
-// printf definition here...
-data .fmt {
-  str: "%d\0"
+```asm
+extern @printf
+glob @main
+
+data .fmt: "%s: %d\0"
+
+fun i32 @add(a i32, b i32) !static {
+  mov r0, %a
+  mov r1, %b
+  add r0, r1
+  ret r0
 }
 
-fun @add(a i32, b i32) i32 {
-  mov r0, %a;
-  mov r1, %b;
-  add r0, r1;
-  ret r0;
-}
-
-fun @main(argc i32, argv ^^i8) {
-  %1 = 10;
-  %2 = 25;
-  %3 = call @add(%1, %2);
-  call @printf(.fmt, %3);
-  ret 0;
+fun i32 @main(argc i32, argv i8^^) {
+  %1 = 10 i32
+  %2 = 25 i32
+  mov  r0, %argv
+  add  r0, WORD
+  %3 = load r0
+  %4 = call @add(%1, %2)
+  call @printf(.fmt, %3, %4)
+  ret  0
 }
 ```
