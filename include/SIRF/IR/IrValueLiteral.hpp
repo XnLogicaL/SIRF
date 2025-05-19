@@ -4,11 +4,13 @@
 #ifndef SIRF_IRVALUELITERAL_HPP
 #define SIRF_IRVALUELITERAL_HPP
 
-#include <cinttypes>
+#include <string>
+#include <format>
+#include <cstdint>
+
 #include <SIRF/Core/APIConfig.hpp>
 #include <SIRF/Core/APIMacros.hpp>
 #include <SIRF/IR/IrValueBase.hpp>
-#include <cstdint>
 
 namespace SIRF {
 
@@ -27,7 +29,7 @@ enum class IrLiteralKind {
   qword, // Quad machine word
 };
 
-union IrLiteralValue {
+union IrLiteralUn {
   int8_t i8;
   int16_t i16;
   int32_t i32;
@@ -45,8 +47,23 @@ union IrLiteralValue {
 class IrValueLiteral : public IrValueBase {
 public:
   const IrLiteralKind kind;
-  const IrLiteralValue value;
+  const IrLiteralUn value;
+
+  explicit IrValueLiteral(IrLiteralKind kind, IrLiteralUn un)
+    : kind(kind),
+      value(un) {}
+
+  bool isSigned() const;
+
+  /// Returns whether if the IR literal value be treated as an lvalue
+  constexpr bool isLvalue() const override;
+
+  /// Returns the string representation of the IR literal value
+  std::string toString() const override;
 };
+
+std::string toString(IrLiteralKind kind);
+std::string toString(IrLiteralKind kind, IrLiteralUn un);
 
 } // namespace SIRF
 
