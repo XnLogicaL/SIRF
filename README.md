@@ -41,7 +41,7 @@ Given a fully implemented frontend, the C code above should emit this SIRF code:
 extern @printf
 global @main
 
-data .fmt: "%s: %d\n\0"
+data .LC0: "%s: %d\n\0"
 
 fun i32 @add(a i32, b i32) !static {
   mov r0, %a
@@ -55,7 +55,7 @@ fun i32 @main(argc i32, argv i8^^) {
   %2 = 25 i32
   %3 = load %argv
   %4 = call @add(%1, %2)
-  call @printf(.fmt, %3, %4)
+  call @printf(.LC0, %3, %4)
   ret  0
 }
 ```
