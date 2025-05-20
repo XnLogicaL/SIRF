@@ -59,3 +59,24 @@ fun i32 @main(argc i32, argv i8^^) {
   ret  0
 }
 ```
+
+Here is a C example with scopes:
+```c
+int main(int, char**) {
+  {
+    int a = 0;
+    int b = 10;
+  }
+}
+```
+
+The result should be the following:
+```asm
+fun i32 @main(i32, i8^^) {
+  ssp
+  %1 = 0 i32
+  %2 = 10 i32
+  rsp
+  ret 0
+}
+```

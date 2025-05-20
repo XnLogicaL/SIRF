@@ -14,6 +14,11 @@
 
 namespace SIRF {
 
+using BYTE = unsigned char;
+using WORD = unsigned short;
+using DWORD = unsigned int;
+using QWORD = unsigned long;
+
 enum class IrLiteralKind {
   i8,    // Signed 8-bit integer
   i16,   // Signed 16-bit integer
@@ -38,10 +43,10 @@ union IrLiteralUn {
   uint16_t u16;
   uint32_t u32;
   uint64_t u64;
-  uint8_t byte;
-  uint16_t word;
-  uint32_t dword;
-  uint64_t qword;
+  BYTE byte;
+  WORD word;
+  DWORD dword;
+  QWORD qword;
 };
 
 class IrValueLiteral : public IrValueBase {
@@ -55,7 +60,7 @@ public:
 
   bool isSigned() const;
 
-  /// Returns whether if the IR literal value be treated as an lvalue
+  /// Returns whether if the IR literal value can be treated as an lvalue
   constexpr bool isLvalue() const override;
 
   /// Returns the string representation of the IR literal value

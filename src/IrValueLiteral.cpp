@@ -68,14 +68,14 @@ std::string toString(IrLiteralKind kind, IrLiteralUn un) {
   case i16:   return std::to_string(un.i16);
   case i32:   return std::to_string(un.i32);
   case i64:   return std::to_string(un.i64);
-  case byte:
   case u8:    return std::to_string(un.u8);
-  case word:
   case u16:   return std::to_string(un.u16);
-  case dword:
   case u32:   return std::to_string(un.u32);
-  case qword:
   case u64:   return std::to_string(un.u64);
+  case byte:  return std::to_string(un.byte);
+  case word:  return std::to_string(un.word);
+  case dword: return std::to_string(un.dword);
+  case qword: return std::to_string(un.qword);
   } // clang-format on
 
   SIRF_UNREACHABLE();
