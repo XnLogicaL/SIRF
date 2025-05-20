@@ -53,8 +53,8 @@ fun i32 @add(a i32, b i32) !static {
 fun i32 @main(argc i32, argv i8^^) {
   %1 = 10 i32
   %2 = 25 i32
-  %3 = load %argv
-  %4 = call @add(%1, %2)
+  load %argv, %3
+  call @add(%1, %2), %4
   call @printf(.LC0, %3, %4)
   ret  0
 }

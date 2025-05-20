@@ -2,7 +2,6 @@
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
 #include <SIRF/IR/IrValueLiteral.hpp>
-#include <string>
 
 namespace SIRF {
 
