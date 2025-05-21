@@ -2,9 +2,7 @@
 Simple Intermediate Representation Format
 
 > [!WARNING]
-> This project is currently in the planning stage.
-
-SIRF is an intermediate representation format that aims to be optimzable, portable and minimal.
+> This project is in the early implementation stage.
 
 # Features
 
