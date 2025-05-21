@@ -29,6 +29,9 @@ enum class IrOpCode {
   SSP,
   CALL,
   RET,
+  JMP,
+  JZ,
+  JNZ,
 };
 
 using IrOperand = std::unique_ptr<IrValueBase>;

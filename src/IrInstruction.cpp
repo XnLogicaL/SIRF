@@ -35,6 +35,9 @@ std::string toString(IrOpCode opcode) {
   case SSP:   return "ssp";
   case CALL:  return "call";
   case RET:   return "ret";
+  case JMP:   return "jmp";
+  case JZ:    return "jz";
+  case JNZ:   return "jnz";
   case NOP:
   default:    return "nop";
   } // clang-format on
