@@ -53,8 +53,8 @@ fun i32 @main(argc i32, argv i8^^) {
   %1 = 10 i32
   %2 = 25 i32
   load %argv, %3
-  call @add(%1, %2), %4
-  call @printf(.LC0, %3, %4)
+  call @add, %4, %1, %2
+  call @printf, _, .LC0, %3, %4
   ret  0
 }
 ```
