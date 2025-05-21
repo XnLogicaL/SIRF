@@ -45,8 +45,7 @@ data .LC0: "%s: %d\n\0"
 
 fun i32 @add(a i32, b i32) !static {
   mov r0, %a
-  mov r1, %b
-  add r0, r1
+  add r0, %b
   ret r0
 }
 
