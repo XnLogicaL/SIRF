@@ -5,7 +5,10 @@
 #define SIRF_IRVALUEBASE_HPP
 
 #include <string>
+#include <memory>
+
 #include <SIRF/Core/APIConfig.hpp>
+#include <SIRF/Core/APIMacros.hpp>
 
 namespace SIRF {
 
@@ -17,6 +20,8 @@ public:
   /// Returns the string representation of the IR value
   virtual std::string toString() const;
 };
+
+using IrValue = std::unique_ptr<IrValueBase>;
 
 } // namespace SIRF
 

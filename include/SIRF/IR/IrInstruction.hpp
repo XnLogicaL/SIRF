@@ -34,8 +34,7 @@ enum class IrOpCode {
   JNZ,
 };
 
-using IrOperand = std::unique_ptr<IrValueBase>;
-using IrOperands = std::vector<IrOperand>;
+using IrOperands = std::vector<IrValue>;
 
 class IrInstruction {
 public:

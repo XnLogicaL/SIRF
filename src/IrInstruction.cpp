@@ -9,7 +9,7 @@ std::string IrInstruction::toString() const {
   std::ostringstream oss;
   oss << SIRF::toString(op) << ' ';
 
-  for (size_t i = 0; const IrOperand& op : ops) {
+  for (size_t i = 0; const IrValue& op : ops) {
     oss << op->toString();
     if (++i < ops.size()) {
       oss << ", ";
