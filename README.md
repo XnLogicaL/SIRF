@@ -16,7 +16,6 @@ SIRF defines abstractions on the following points as:
 
 # Examples
 
-Consider the following C code:
 ```c
 #include <stdio.h> // For printf
 
@@ -33,8 +32,7 @@ int main(int argc, char** argv) {
   return 0;
 }
 ```
-
-Given a fully implemented frontend, the C code above should emit this SIRF code:
+SIRF IR equivalent:
 ```asm
 extern @printf
 global @main
@@ -50,30 +48,108 @@ fun i32 @add(a i32, b i32) !static {
 fun i32 @main(argc i32, argv i8^^) {
   %1 = 10 i32
   %2 = 25 i32
+  %3 = i32
+  %4 = i32
   load %argv, %3
   call @add, %4, %1, %2
   call @printf, _, .LC0, %3, %4
-  ret  0
+  ret  0 i32
 }
 ```
 
-Here is a C example with scopes:
+---
+
 ```c
-int main(int, char**) {
-  {
-    int a = 0;
-    int b = 10;
+#include <stdio.h>
+
+int sum_to_n(int n) {
+  int acc = 0;
+  while (n > 0) {
+    acc += n;
+    n -= 1;
   }
+  return acc;
+}
+
+int main(int, char**) {
+  int total = sum_to_n(5);
+  printf("Sum: %d\n", total);
+  return 0;
+}
+```
+SIRF IR equivalent:
+```asm
+extern @printf
+global @main
+
+data .LC0: "Sum: %d\n\0"
+
+fun i32 sum_to_n(n i32) !static {
+  %0 = 0 i32
+  jmp .L1
+.L0:
+  ssp
+  add %0, %n
+  sub %n, 1 i32
+  rsp
+.L1:
+  %1 = BYTE
+  gt  %1, %n, 0 i32
+  jnz %1, .L0
+  ret %0
+}
+
+fun i32 main(i32, i8^^) {
+  %0 = i32
+  call @sum_to_n, %0, 5 i32
+  call @printf, _, .LC0, %0
+  ret  0 i32
 }
 ```
 
-The result should be the following:
+---
+
+```c
+#include <stdio.h>
+
+int abs_diff(int a, int b) {
+  if (a > b)
+    return a - b;
+  else
+    return b - a;
+}
+
+int main() {
+  int result = abs_diff(42, 17);
+  printf("Absolute Difference: %d\n", result);
+  return 0;
+}
+```
+SIRF IR equivalent:
 ```asm
+extern @printf
+global @main
+
+data .LC0: "Absolute Difference: %d\n\0"
+
+fun i32 @abs_diff(a i32, b i32) !static {
+  %0 = BYTE
+  gt  %0, %a, %b
+  jnz %0, .L1
+.L0:
+  %1 = i32
+  sub %1, %b, %a
+  ret %1
+.L1:
+  %2 = i32
+  sub %2, %a, %b
+  ret %2
+}
+
 fun i32 @main(i32, i8^^) {
-  ssp
-  %1 = 0 i32
-  %2 = 10 i32
-  rsp
-  ret 0
+  %0 = i32
+  call @abs_diff, %0, 42 i32, 17 i32
+  call @printf, _, .LC0, %0
+  ret 0 i32
 }
 ```
