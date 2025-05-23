@@ -1,11 +1,11 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#include <SIRF/IR/IrInstruction.hpp>
+#include <SIRF/IR/IrStmtInstruction.hpp>
 
 namespace SIRF {
 
-std::string IrInstruction::toString() const {
+std::string IrStmtInstruction::toString() const {
   std::ostringstream oss;
   oss << SIRF::toString(op) << ' ';
 

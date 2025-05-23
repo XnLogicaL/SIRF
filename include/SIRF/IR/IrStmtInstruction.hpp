@@ -37,12 +37,12 @@ enum class IrOpCode {
 
 using IrOperands = std::vector<IrValue>;
 
-class IrInstruction final : public IrStmtBase {
+class IrStmtInstruction final : public IrStmtBase {
 public:
   const IrOpCode op;
   const IrOperands ops;
 
-  explicit IrInstruction(IrOpCode op, IrOperands ops)
+  explicit IrStmtInstruction(IrOpCode op, IrOperands ops)
     : op(op),
       ops(std::move(ops)) {}
 
