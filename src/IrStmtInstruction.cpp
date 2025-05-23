@@ -7,7 +7,7 @@ namespace SIRF {
 
 std::string IrStmtInstruction::toString() const {
   std::ostringstream oss;
-  oss << SIRF::toString(op) << ' ';
+  oss << "  " << SIRF::toString(op) << ' ';
 
   for (size_t i = 0; const IrValue& op : ops) {
     oss << op->toString();
@@ -16,6 +16,7 @@ std::string IrStmtInstruction::toString() const {
     }
   }
 
+  oss << '\n';
   return oss.str();
 }
 
