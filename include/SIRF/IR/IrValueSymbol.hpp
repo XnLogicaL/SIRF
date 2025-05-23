@@ -12,7 +12,7 @@
 
 namespace SIRF {
 
-class IrValueSymbol : public IrValueBase {
+class IrValueSymbol final : public IrValueBase {
 public:
   const std::string id;
 

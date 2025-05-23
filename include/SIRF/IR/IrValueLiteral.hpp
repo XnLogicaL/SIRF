@@ -14,24 +14,20 @@
 
 namespace SIRF {
 
-using BYTE = unsigned char;
-using WORD = unsigned short;
-using DWORD = unsigned int;
-using QWORD = unsigned long;
+using BYTE = uint8_t;
+using WORD = uintptr_t;
 
 enum class IrLiteralKind {
-  i8,    // Signed 8-bit integer
-  i16,   // Signed 16-bit integer
-  i32,   // Signed 32-bit integer
-  i64,   // Signed 64-bit integer
-  u8,    // Unsigned 8-bit integer
-  u16,   // Unsigned 16-bit integer
-  u32,   // Unsigned 32-bit integer
-  u64,   // Unsigned 64-bit integer
-  byte,  // One byte
-  word,  // Machine word
-  dword, // Double machine word
-  qword, // Quad machine word
+  i8,   // Signed 8-bit integer
+  i16,  // Signed 16-bit integer
+  i32,  // Signed 32-bit integer
+  i64,  // Signed 64-bit integer
+  u8,   // Unsigned 8-bit integer
+  u16,  // Unsigned 16-bit integer
+  u32,  // Unsigned 32-bit integer
+  u64,  // Unsigned 64-bit integer
+  byte, // One byte
+  word, // Machine word
 };
 
 union IrLiteralUn {
@@ -45,11 +41,9 @@ union IrLiteralUn {
   uint64_t u64;
   BYTE byte;
   WORD word;
-  DWORD dword;
-  QWORD qword;
 };
 
-class IrValueLiteral : public IrValueBase {
+class IrValueLiteral final : public IrValueBase {
 public:
   const IrLiteralKind kind;
   const IrLiteralUn value;

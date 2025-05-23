@@ -1,8 +1,8 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#ifndef SIRF_IRVALUEBASE_HPP
-#define SIRF_IRVALUEBASE_HPP
+#ifndef SIRF_IRSTMTBASE_HPP
+#define SIRF_IRSTMTBASE_HPP
 
 #include <string>
 #include <memory>
@@ -12,16 +12,12 @@
 
 namespace SIRF {
 
-class IrValueBase {
+class IrStmtBase {
 public:
-  /// Returns whether if the IR value be treated as an lvalue
-  virtual constexpr bool isLvalue() const;
-
-  /// Returns the string representation of the IR value
   virtual std::string toString() const;
 };
 
-using IrValue = std::shared_ptr<IrValueBase>;
+using IrStmt = std::shared_ptr<IrStmtBase>;
 
 } // namespace SIRF
 

@@ -22,7 +22,7 @@ union IrSSAUn {
   const char* name;
 };
 
-class IrValueSSA : public IrValueBase {
+class IrValueSSA final : public IrValueBase {
 public:
   const IrSSAKind kind;
   const IrSSAUn value;

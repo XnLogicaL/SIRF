@@ -1,11 +1,12 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#ifndef SIRF_IRDECLARATION_HPP
-#define SIRF_IRDECLARATION_HPP
+#ifndef SIRF_IRSTMTDECLARATION_HPP
+#define SIRF_IRSTMTDECLARATION_HPP
 
 #include <SIRF/Core/APIConfig.hpp>
 #include <SIRF/Core/APIMacros.hpp>
+#include <SIRF/IR/IrStmtBase.hpp>
 #include <SIRF/IR/IrValueBase.hpp>
 
 namespace SIRF {
@@ -15,16 +16,16 @@ enum class IrDeclKind {
   GLOBAL,
 };
 
-class IrDeclaration {
+class IrStmtDeclaration final : public IrStmtBase {
 public:
   const IrDeclKind kind;
   const IrValue value;
 
-  explicit IrDeclaration(IrDeclKind kind, IrValue&& value)
+  explicit IrStmtDeclaration(IrDeclKind kind, IrValue&& value)
     : kind(kind),
       value(std::move(value)) {}
 
-  std::string toString() const;
+  std::string toString() const override;
 };
 
 std::string toString(IrDeclKind kind);

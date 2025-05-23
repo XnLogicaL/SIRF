@@ -19,7 +19,7 @@ enum class IrRegisterKind {
   BYTE,  // b0
 };
 
-class IrValueRegister : public IrValueBase {
+class IrValueRegister final : public IrValueBase {
 public:
   const uint32_t id;
   const IrRegisterKind kind;
