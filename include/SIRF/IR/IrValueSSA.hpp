@@ -9,24 +9,14 @@
 
 namespace SIRF {
 
-enum class IrSSAKind {
-  NUMBERED,
-  NAMED,
-};
-
-union IrSSAUn {
-  uint32_t number;
-  const char* name;
-};
-
 class IrValueSSA final : public IrValueBase {
 public:
-  const IrSSAKind kind;
-  const IrSSAUn value;
+  const std::string id;
+  const size_t version;
 
-  explicit IrValueSSA(IrSSAKind kind, IrSSAUn un)
-    : kind(kind),
-      value(un) {}
+  explicit IrValueSSA(std::string id, size_t version)
+    : id(id),
+      version(version) {}
 
   /// Returns whether if the Ir value can be interpreted as an lvalue
   constexpr bool isLvalue() const override;

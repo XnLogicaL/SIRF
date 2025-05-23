@@ -1,16 +1,12 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#include <IR/IrValueSSA.hpp>
+#include <IR/IrTypeSized.hpp>
 
 namespace SIRF {
 
-constexpr bool IrValueSSA::isLvalue() const {
-  return true;
-}
-
-std::string IrValueSSA::toString() const {
-  return '%' + id + std::to_string(version);
+std::string IrTypeSized::toString() const {
+  return (isSigned ? 'i' : 'u') + std::to_string(size);
 }
 
 } // namespace SIRF

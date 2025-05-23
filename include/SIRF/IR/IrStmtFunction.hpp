@@ -5,6 +5,8 @@
 #define SIRF_IRSTMTFUNCTION_HPP
 
 #include <Core/Common.hpp>
+#include <IR/IrValueSSA.hpp>
+#include <IR/IrValueSymbol.hpp>
 #include <IR/IrAttribute.hpp>
 #include <IR/IrTypeBase.hpp>
 #include <IR/IrStmtBase.hpp>
@@ -13,21 +15,21 @@
 namespace SIRF {
 
 struct IrParameter {
-  const std::string id;
+  const IrValueSSA id;
   const IrType type;
 };
 
 class IrStmtFunction final : public IrStmtBase {
 public:
   const IrType retType;
-  const std::string id;
+  const IrValueSymbol id;
   const std::vector<IrParameter> params;
   const std::vector<IrAttribute> attribs;
   const IrScope body;
 
   explicit IrStmtFunction(
     IrType ret,
-    std::string id,
+    IrValueSymbol id,
     std::vector<IrParameter> pars,
     std::vector<IrAttribute> atts,
     IrScope body
