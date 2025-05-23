@@ -19,6 +19,8 @@ public:
 
   explicit IrAttribute(std::string id)
     : id(id) {}
+
+  std::string toString() const;
 };
 
 } // namespace SIRF
