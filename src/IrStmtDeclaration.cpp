@@ -6,7 +6,7 @@
 namespace SIRF {
 
 std::string IrStmtDeclaration::toString() const {
-  return SIRF::toString(kind) + ' ' + value->toString();
+  return SIRF::toString(kind) + ' ' + value->toString() + '\n';
 }
 
 std::string toString(IrDeclKind kind) {

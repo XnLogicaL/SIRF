@@ -13,10 +13,10 @@ public:
   virtual ~IrValueBase() = default;
 
   /// Returns whether if the IR value be treated as an lvalue
-  virtual constexpr bool isLvalue() const;
+  virtual constexpr bool isLvalue() const = 0;
 
   /// Returns the string representation of the IR value
-  virtual std::string toString() const;
+  virtual std::string toString() const = 0;
 };
 
 using IrValue = std::shared_ptr<IrValueBase>;

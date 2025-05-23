@@ -9,6 +9,8 @@
 #include <vector>
 #include <memory>
 #include <sstream>
+#include <optional>
+#include <variant>
 
 #include "APIConfig.hpp"
 #include "APIMacros.hpp"

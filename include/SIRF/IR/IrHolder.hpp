@@ -1,0 +1,24 @@
+// This file is a part of the SIRF (Simple Intermediate Representation Format)
+// project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
+
+#ifndef SIRF_IRHOLDER_HPP
+#define SIRF_IRHOLDER_HPP
+
+#include <Core/Common.hpp>
+#include <IR/IrStmtBase.hpp>
+
+namespace SIRF {
+
+class IrHolder final {
+public:
+  std::vector<IrStmt>& get();
+
+  const std::vector<IrStmt>& get() const;
+
+private:
+  std::vector<IrStmt> data;
+};
+
+} // namespace SIRF
+
+#endif
