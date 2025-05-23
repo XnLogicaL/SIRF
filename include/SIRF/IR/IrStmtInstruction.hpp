@@ -13,6 +13,7 @@
 #include <SIRF/Core/APIConfig.hpp>
 #include <SIRF/Core/APIMacros.hpp>
 #include <SIRF/IR/IrValueBase.hpp>
+#include <SIRF/IR/IrStmtBase.hpp>
 
 namespace SIRF {
 
@@ -36,7 +37,7 @@ enum class IrOpCode {
 
 using IrOperands = std::vector<IrValue>;
 
-class IrInstruction {
+class IrInstruction final : public IrStmtBase {
 public:
   const IrOpCode op;
   const IrOperands ops;
@@ -45,7 +46,7 @@ public:
     : op(op),
       ops(std::move(ops)) {}
 
-  std::string toString() const;
+  std::string toString() const override;
 };
 
 std::string toString(IrOpCode opcode);
