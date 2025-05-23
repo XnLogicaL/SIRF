@@ -4,11 +4,8 @@
 #ifndef SIRF_IRVALUESYMBOL_HPP
 #define SIRF_IRVALUESYMBOL_HPP
 
-#include <string>
-
-#include <SIRF/Core/APIConfig.hpp>
-#include <SIRF/Core/APIMacros.hpp>
-#include <SIRF/IR/IrValueBase.hpp>
+#include <Core/Common.hpp>
+#include <IR/IrValueBase.hpp>
 
 namespace SIRF {
 

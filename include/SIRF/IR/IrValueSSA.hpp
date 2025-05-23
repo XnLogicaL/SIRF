@@ -4,11 +4,8 @@
 #ifndef SIRF_IRVALUESSA_HPP
 #define SIRF_IRVALUESSA_HPP
 
-#include <cstdint>
-
-#include <SIRF/Core/APIConfig.hpp>
-#include <SIRF/Core/APIMacros.hpp>
-#include <SIRF/IR/IrValueBase.hpp>
+#include <Core/Common.hpp>
+#include <IR/IrValueBase.hpp>
 
 namespace SIRF {
 

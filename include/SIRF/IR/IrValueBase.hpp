@@ -4,11 +4,7 @@
 #ifndef SIRF_IRVALUEBASE_HPP
 #define SIRF_IRVALUEBASE_HPP
 
-#include <string>
-#include <memory>
-
-#include <SIRF/Core/APIConfig.hpp>
-#include <SIRF/Core/APIMacros.hpp>
+#include <Core/Common.hpp>
 
 namespace SIRF {
 

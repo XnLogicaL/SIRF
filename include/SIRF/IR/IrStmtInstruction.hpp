@@ -4,16 +4,9 @@
 #ifndef SIRF_IRINSTRUCTION_HPP
 #define SIRF_IRINSTRUCTION_HPP
 
-#include <cstdint>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <memory>
-
-#include <SIRF/Core/APIConfig.hpp>
-#include <SIRF/Core/APIMacros.hpp>
-#include <SIRF/IR/IrValueBase.hpp>
-#include <SIRF/IR/IrStmtBase.hpp>
+#include <Core/Common.hpp>
+#include <IR/IrValueBase.hpp>
+#include <IR/IrStmtBase.hpp>
 
 namespace SIRF {
 

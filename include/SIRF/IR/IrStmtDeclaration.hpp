@@ -4,10 +4,9 @@
 #ifndef SIRF_IRSTMTDECLARATION_HPP
 #define SIRF_IRSTMTDECLARATION_HPP
 
-#include <SIRF/Core/APIConfig.hpp>
-#include <SIRF/Core/APIMacros.hpp>
-#include <SIRF/IR/IrStmtBase.hpp>
-#include <SIRF/IR/IrValueBase.hpp>
+#include <Core/Common.hpp>
+#include <IR/IrStmtBase.hpp>
+#include <IR/IrValueBase.hpp>
 
 namespace SIRF {
 

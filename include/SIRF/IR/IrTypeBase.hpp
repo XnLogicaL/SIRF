@@ -1,22 +1,21 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#ifndef SIRF_IRSTMTBASE_HPP
-#define SIRF_IRSTMTBASE_HPP
+#ifndef SIRF_IRTYPEBASE_HPP
+#define SIRF_IRTYPEBASE_HPP
 
 #include <Core/Common.hpp>
 
 namespace SIRF {
 
-class IrStmtBase {
+class IrTypeBase {
 public:
-  virtual ~IrStmtBase() = default;
+  virtual ~IrTypeBase() = default;
 
   virtual std::string toString() const;
 };
 
-using IrStmt = std::shared_ptr<IrStmtBase>;
-using IrScope = std::vector<IrStmt>;
+using IrType = std::shared_ptr<IrTypeBase>;
 
 } // namespace SIRF
 

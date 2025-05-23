@@ -4,12 +4,8 @@
 #ifndef SIRF_IRATTRIBUTE_HPP
 #define SIRF_IRATTRIBUTE_HPP
 
-#include <string>
-#include <vector>
-
-#include <SIRF/Core/APIConfig.hpp>
-#include <SIRF/Core/APIMacros.hpp>
-#include <SIRF/IR/IrValueBase.hpp>
+#include <Core/Common.hpp>
+#include <IR/IrValueBase.hpp>
 
 namespace SIRF {
 
