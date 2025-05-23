@@ -39,13 +39,13 @@ global @main
 
 data .LC0: "%s: %d\n\0"
 
-fun i32 @add(a i32, b i32) !static {
+fun i32 @add(%a i32, %b i32) !static {
   mov r0, %a
   add r0, %b
   ret r0
 }
 
-fun i32 @main(argc i32, argv i8^^) {
+fun i32 @main(%argc i32, %argv i8^^) {
   %1 = 10 i32
   %2 = 25 i32
   %3 = i32
@@ -84,7 +84,7 @@ global @main
 
 data .LC0: "Sum: %d\n\0"
 
-fun i32 sum_to_n(n i32) !static {
+fun i32 sum_to_n(%n i32) !static {
   %0 = 0 i32
   jmp .L1
 .L0:
@@ -132,7 +132,7 @@ global @main
 
 data .LC0: "Absolute Difference: %d\n\0"
 
-fun i32 @abs_diff(a i32, b i32) !static {
+fun i32 @abs_diff(%a i32, %b i32) !static {
   %0 = BYTE
   gt  %0, %a, %b
   jnz %0, .L1
