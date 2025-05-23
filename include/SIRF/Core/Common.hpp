@@ -11,6 +11,7 @@
 #include <sstream>
 #include <optional>
 #include <variant>
+#include <format>
 
 #include "APIConfig.hpp"
 #include "APIMacros.hpp"

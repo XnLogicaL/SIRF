@@ -9,6 +9,11 @@
 #include <IR/IrStmtDeclaration.hpp>
 #include <IR/IrStmtFunction.hpp>
 #include <IR/IrStmtInstruction.hpp>
+#include <IR/IrValueRegister.hpp>
+#include <IR/IrValueSSA.hpp>
+#include <IR/IrValueLiteral.hpp>
+#include <IR/IrValueSymbol.hpp>
+#include <IR/IrValueLabel.hpp>
 #include <IR/IrHolder.hpp>
 
 namespace SIRF {
@@ -38,8 +43,8 @@ public:
 
 private:
   const IrAnalysisResult analyzeIrStmtAssign(const IrStmtAssign& assign) const;
-  const IrAnalysisResult analyzeIrStmtDeclaration(const IrStmtDeclaration& decl) const;
   const IrAnalysisResult analyzeIrStmtFunction(const IrStmtFunction& func) const;
+  const IrAnalysisResult analyzeIrStmtDeclaration(const IrStmtDeclaration& decl) const;
   const IrAnalysisResult analyzeIrStmtInstruction(const IrStmtInstruction& insn) const;
 
 private:
