@@ -25,6 +25,10 @@ public:
   explicit IrTypeNamed(IrNamedTypeKind kind)
     : kind(kind) {}
 
+  static inline IrType newType(IrNamedTypeKind kind) {
+    return std::make_shared<IrTypeNamed>(kind);
+  }
+
   std::string toString() const override;
 };
 

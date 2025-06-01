@@ -14,8 +14,12 @@ class IrStmtLabel final : public IrStmtBase {
 public:
   const IrValueLabel label;
 
-  explicit IrStmtLabel(IrValueLabel label)
+  explicit IrStmtLabel(IrValueLabel&& label)
     : label(label) {}
+
+  static inline IrStmt newStmt(IrValueLabel&& label) {
+    return std::make_shared<IrStmtLabel>(std::move(label));
+  }
 
   std::string toString() const override;
 };

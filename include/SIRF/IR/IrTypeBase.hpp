@@ -10,9 +10,7 @@ namespace SIRF {
 
 class IrTypeBase {
 public:
-  virtual ~IrTypeBase() = default;
-
-  virtual std::string toString() const;
+  virtual std::string toString() const = 0;
 };
 
 using IrType = std::shared_ptr<IrTypeBase>;

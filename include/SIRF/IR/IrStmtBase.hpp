@@ -10,9 +10,7 @@ namespace SIRF {
 
 class IrStmtBase {
 public:
-  virtual ~IrStmtBase() = default;
-
-  virtual std::string toString() const;
+  virtual std::string toString() const = 0;
 };
 
 using IrStmt = std::shared_ptr<IrStmtBase>;

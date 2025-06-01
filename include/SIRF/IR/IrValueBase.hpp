@@ -10,8 +10,6 @@ namespace SIRF {
 
 class IrValueBase {
 public:
-  virtual ~IrValueBase() = default;
-
   /// Returns whether if the IR value be treated as an lvalue
   virtual constexpr bool isLvalue() const = 0;
 

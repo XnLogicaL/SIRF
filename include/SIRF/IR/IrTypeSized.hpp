@@ -18,6 +18,10 @@ public:
     : isSigned(isSigned),
       size(size) {}
 
+  static inline IrType newType(bool isSigned, uint64_t size) {
+    return std::make_shared<IrTypeSized>(isSigned, size);
+  }
+
   std::string toString() const override;
 };
 

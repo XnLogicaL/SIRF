@@ -11,13 +11,13 @@ using enum IrAnalysisResultKind;
 template<typename Base, typename T>
   requires std::is_base_of_v<Base, T>
 static bool isInstanceOf(const Base* base) {
-  return dynamic_cast<const T*>(base) != nullptr;
+  return dynamic_cast<const T*>(base) != NULL;
 }
 
 static const IrStmtDeclaration* getFuncDecl(const IrHolder& holder, const IrValueSymbol& symbol) {
-  for (const IrStmt& stmt : holder.get()) {
+  for (const IrStmt& stmt : holder.data) {
     const IrStmtDeclaration* stmtDecl = dynamic_cast<const IrStmtDeclaration*>(stmt.get());
-    if (stmtDecl == nullptr)
+    if (stmtDecl == NULL)
       continue;
 
     const IrValueSymbol* declSymbol = dynamic_cast<const IrValueSymbol*>(stmtDecl->value.get());
@@ -25,23 +25,23 @@ static const IrStmtDeclaration* getFuncDecl(const IrHolder& holder, const IrValu
       return stmtDecl;
   }
 
-  return nullptr;
+  return NULL;
 }
 
 static const IrStmtFunction* getFuncDef(const IrHolder& holder, const IrValueSymbol& symbol) {
-  for (const IrStmt& stmt : holder.get()) {
+  for (const IrStmt& stmt : holder.data) {
     const IrStmtFunction* stmtFunDef = dynamic_cast<const IrStmtFunction*>(stmt.get());
     if (stmtFunDef && stmtFunDef->id.id == symbol.id)
       return stmtFunDef;
   }
 
-  return nullptr;
+  return NULL;
 }
 
 const std::vector<IrAnalysisResult> IrAnalyzer::analyzeHolder() const {
   std::vector<IrAnalysisResult> results;
 
-  for (const IrStmt& stmt : holder.get()) {
+  for (const IrStmt& stmt : holder.data) {
     const auto result = analyzeIrStmt(stmt);
     results.push_back(result);
   }
@@ -64,15 +64,15 @@ const IrAnalysisResult IrAnalyzer::analyzeIrStmt(const IrStmt& stmt) const {
 
 const IrAnalysisResult IrAnalyzer::analyzeIrStmtAssign(const IrStmtAssign& irAssign) const {
   if (!irAssign.lvalue->isLvalue())
-    return {RES_ERROR, "Assignment to non-lvalue"};
+    return {RES_ERROR, "assignment to non-lvalue"};
 
   return {OK};
 }
 
 const IrAnalysisResult IrAnalyzer::analyzeIrStmtDeclaration(const IrStmtDeclaration& irDecl) const {
   const IrValueSymbol* symbol = dynamic_cast<const IrValueSymbol*>(irDecl.value.get());
-  if (symbol == nullptr)
-    return {RES_ERROR, "Declaration must be a symbol"};
+  if (symbol == NULL)
+    return {RES_ERROR, "declaration must be a symbol"};
 
   return {OK};
 }
@@ -102,6 +102,34 @@ const IrAnalysisResult IrAnalyzer::analyzeIrStmtInstruction(const IrStmtInstruct
       && !isInstanceOf<IrValueBase, IrValueLiteral>(src.get())) // clang-format on
       return {RES_ERROR, "mov instruction operand 1 must be a register, literal or SSA"};
   }
+  else if (irInsn.op == IrOpCode::LOAD) {
+    if (irInsn.ops.size() < 2)
+      return {RES_WARN, "load instruction must provide 2 operands"};
+
+    const IrValue& dst = irInsn.ops.at(0);
+    const IrValue& src = irInsn.ops.at(1);
+
+    if (!isInstanceOf<IrValueBase, IrValueRegister>(dst.get()))
+      return {RES_ERROR, "load instruction operand 0 must be a register"};
+
+    if (!isInstanceOf<IrValueBase, IrValuePtr>(src.get()))
+      return {RES_ERROR, "load instruction operand 1 must be a pointer"};
+  }
+  else if (irInsn.op == IrOpCode::STORE) {
+    if (irInsn.ops.size() < 2)
+      return {RES_WARN, "store instruction must provide 2 operands"};
+
+    const IrValue& dst = irInsn.ops.at(0);
+    const IrValue& src = irInsn.ops.at(1);
+
+    if (!isInstanceOf<IrValueBase, IrValuePtr>(dst.get()))
+      return {RES_ERROR, "store instruction operand 0 must be a register, literal or SSA"};
+
+    if (!isInstanceOf<IrValueBase, IrValueRegister>(src.get()))
+      return {RES_ERROR, "store instruction operand 1 must be a pointer"};
+  }
+  else if (irInsn.op == IrOpCode::ADD) {
+  }
   else if (irInsn.op == IrOpCode::CALL) {
     if (irInsn.ops.empty())
       return {RES_ERROR, "call instruction must provide operand 0"};
@@ -109,12 +137,12 @@ const IrAnalysisResult IrAnalyzer::analyzeIrStmtInstruction(const IrStmtInstruct
     const IrValue& callee = irInsn.ops.front();
     const IrValueSymbol* symbol = dynamic_cast<const IrValueSymbol*>(callee.get());
     const IrStmtDeclaration* funDecl = getFuncDecl(holder, *symbol);
-    if (funDecl == nullptr)
-      return {RES_ERROR, "Callee symbol not declared"};
+    if (funDecl == NULL)
+      return {RES_ERROR, "callee symbol not declared"};
 
     const IrStmtFunction* funDef = getFuncDef(holder, *symbol);
-    if (funDecl->kind != EXTERN && funDef == nullptr)
-      return {RES_ERROR, "Undefined reference to symbol"};
+    if (funDecl->kind != EXTERN && funDef == NULL)
+      return {RES_ERROR, "undefined reference to symbol"};
   }
 
   return {OK};

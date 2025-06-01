@@ -50,9 +50,9 @@ fun i32 @main(%argc i32, %argv i8^^) {
   %2 = 25 i32
   %3 = i32
   %4 = i32
-  load %argv, %3
+  load %3, ptr %argv
   call @add, %4, %1, %2
-  call @printf, _, .LC0, %3, %4
+  call @printf, _, ptr .LC0, %3, %4
   ret  0 i32
 }
 ```
@@ -102,7 +102,7 @@ fun i32 sum_to_n(%n i32) !static {
 fun i32 main(i32, i8^^) {
   %0 = i32
   call @sum_to_n, %0, 5 i32
-  call @printf, _, .LC0, %0
+  call @printf, _, ptr .LC0, %0
   ret  0 i32
 }
 ```
@@ -149,7 +149,7 @@ fun i32 @abs_diff(%a i32, %b i32) !static {
 fun i32 @main(i32, i8^^) {
   %0 = i32
   call @abs_diff, %0, 42 i32, 17 i32
-  call @printf, _, .LC0, %0
+  call @printf, _, ptr .LC0, %0
   ret 0 i32
 }
 ```

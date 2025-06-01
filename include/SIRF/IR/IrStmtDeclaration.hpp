@@ -24,6 +24,10 @@ public:
     : kind(kind),
       value(std::move(value)) {}
 
+  inline static IrStmt newStmt(IrDeclKind kind, IrValue&& value) {
+    return std::make_shared<IrStmtDeclaration>(kind, std::move(value));
+  }
+
   std::string toString() const override;
 };
 

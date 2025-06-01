@@ -20,6 +20,10 @@ public:
     : lvalue(lvalue),
       rvalue(rvalue) {}
 
+  inline static IrStmt newStmt(IrValue lvalue, IrValue rvalue) {
+    return std::make_shared<IrStmtAssign>(std::move(lvalue), std::move(rvalue));
+  }
+
   std::string toString() const override;
 };
 

@@ -19,6 +19,10 @@ public:
     : type(type),
       value(val) {}
 
+  static inline IrValue newValue(IrType type, uint64_t val) {
+    return std::make_shared<IrValueLiteral>(type, val);
+  }
+
   bool isSigned() const;
 
   /// Returns whether if the IR literal value can be treated as an lvalue

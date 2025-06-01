@@ -17,6 +17,10 @@ namespace SIRF {
 struct IrParameter {
   const IrValueSSA id;
   const IrType type;
+
+  explicit IrParameter(IrValueSSA&& id, IrType&& type)
+    : id(std::move(id)),
+      type(std::move(type)) {}
 };
 
 class IrStmtFunction final : public IrStmtBase {
@@ -39,6 +43,18 @@ public:
       params(pars),
       attribs(atts),
       body(body) {}
+
+  inline static IrStmt newStmt(
+    IrType ret,
+    IrValueSymbol id,
+    std::vector<IrParameter> pars,
+    std::vector<IrAttribute> atts,
+    IrScope body
+  ) {
+    return std::make_shared<IrStmtFunction>(
+      std::move(ret), std::move(id), std::move(pars), std::move(atts), std::move(body)
+    );
+  }
 
   std::string toString() const override;
 };

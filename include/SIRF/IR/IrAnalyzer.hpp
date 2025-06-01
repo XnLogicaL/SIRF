@@ -14,6 +14,7 @@
 #include <IR/IrValueLiteral.hpp>
 #include <IR/IrValueSymbol.hpp>
 #include <IR/IrValueLabel.hpp>
+#include <IR/IrValuePtr.hpp>
 #include <IR/IrHolder.hpp>
 
 namespace SIRF {

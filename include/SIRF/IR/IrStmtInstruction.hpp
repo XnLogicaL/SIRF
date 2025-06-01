@@ -39,6 +39,10 @@ public:
     : op(op),
       ops(std::move(ops)) {}
 
+  static inline IrStmt newStmt(IrOpCode op, IrOperands&& ops) {
+    return std::make_shared<IrStmtInstruction>(op, std::move(ops));
+  }
+
   std::string toString() const override;
 };
 
