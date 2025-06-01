@@ -14,7 +14,9 @@ target_include_directories(sirf PUBLIC
   include/SIRF
 )
 
-add_executable(sirfc sirfc/main.cpp)
+file(GLOB_RECURSE SIRFC_SOURCES sirfc/*.cpp)
+
+add_executable(sirfc ${SIRFC_SOURCES})
 
 add_subdirectory(thirdparty/spdlog)
 add_subdirectory(thirdparty/argparse)

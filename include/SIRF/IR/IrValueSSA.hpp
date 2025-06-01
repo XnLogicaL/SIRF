@@ -18,6 +18,10 @@ public:
     : id(id),
       version(version) {}
 
+  static inline IrValue newValue(std::string id, size_t version) {
+    return std::make_shared<IrValueSSA>(id, version);
+  }
+
   /// Returns whether if the Ir value can be interpreted as an lvalue
   constexpr bool isLvalue() const override;
 

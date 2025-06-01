@@ -51,7 +51,7 @@ void AsmGenerator::generateTarget_x86_64(const IrStmt& stat) {
 
     currentFunction = oldFun;
 
-    section_text << ".L__ep_" << fun->id.id << ":\n";
+    section_text << ".L" << fun->id.id << ".epilogue:\n";
     section_text << "  pop rbp\n";
     section_text << "  ret\n";
   }
@@ -80,7 +80,7 @@ void AsmGenerator::generateTarget_x86_64(const IrStmt& stat) {
       }
 
       if (currentFunction) {
-        section_text << "  jmp .L__ep_" << currentFunction->id.id << "\n";
+        section_text << "  jmp .L" << currentFunction->id.id << ".epilogue\n";
       }
       else {
         // TODO: Add diagnostic

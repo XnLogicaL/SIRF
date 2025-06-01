@@ -12,6 +12,7 @@
 #include <optional>
 #include <variant>
 #include <format>
+#include <unordered_map>
 
 #include "APIConfig.hpp"
 #include "APIMacros.hpp"
