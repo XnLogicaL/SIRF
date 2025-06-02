@@ -212,7 +212,8 @@ void IrParser::parse() {
     }
   }
   catch (const IrParserException& err) {
-    spdlog::error("file:{}:{}: {}", err.line, err.off, err.msg);
+    state.fail = true;
+    spdlog::error("{}:{}:{}: {}", path, err.line, err.off, err.msg);
   }
 }
 

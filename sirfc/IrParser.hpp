@@ -1,8 +1,8 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#ifndef SIRF_IRPARSER_HPP
-#define SIRF_IRPARSER_HPP
+#ifndef SIRFC_IRPARSER_HPP
+#define SIRFC_IRPARSER_HPP
 
 #include <cassert>
 #include <exception>
@@ -22,6 +22,7 @@
 #include <IR/IrTypePtr.hpp>
 #include <IR/IrHolder.hpp>
 #include "IrLexer.hpp"
+#include "CState.hpp"
 
 namespace SIRF {
 
@@ -39,10 +40,12 @@ public:
 
 class IrParser final {
 public:
-  explicit IrParser(const std::string& source, const TokenHolder& tokHolder, IrHolder& irHolder)
-    : irHolder(irHolder),
-      tokHolder(tokHolder),
-      source(source) {}
+  explicit IrParser(CState& state)
+    : state(state),
+      irHolder(state.irHolder),
+      tokHolder(state.tokHolder),
+      path(state.filePath),
+      source(state.fileSource) {}
 
   void parse();
 
@@ -60,8 +63,10 @@ private:
 private:
   size_t pos = 0;
 
+  CState& state;
   IrHolder& irHolder;
   const TokenHolder& tokHolder;
+  const std::string& path;
   const std::string& source;
 };
 

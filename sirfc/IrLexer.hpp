@@ -1,10 +1,11 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#ifndef SIRF_IRLEXER_HPP
-#define SIRF_IRLEXER_HPP
+#ifndef SIRFC_IRLEXER_HPP
+#define SIRFC_IRLEXER_HPP
 
 #include <Core/Common.hpp>
+#include "CState.hpp"
 
 namespace SIRF {
 
@@ -40,13 +41,11 @@ struct Token {
   std::string lexeme;
 };
 
-using TokenHolder = std::vector<Token>;
-
 class IrLexer final {
 public:
-  explicit IrLexer(const std::string& source, TokenHolder& holder)
-    : holder(holder),
-      source(source) {}
+  explicit IrLexer(CState& state)
+    : holder(state.tokHolder),
+      source(state.fileSource) {}
 
   void tokenize();
 
