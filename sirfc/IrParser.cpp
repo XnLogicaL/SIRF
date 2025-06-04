@@ -6,7 +6,7 @@
 #include <spdlog/spdlog.h>
 #include <algorithm>
 
-namespace SIRF {
+namespace sirf {
 
 using enum TokenKind;
 
@@ -31,29 +31,29 @@ static std::pair<size_t, size_t> translateOffset(const std::string& source, size
 }
 
 Token IrParser::peek(int ahead) {
-  if (pos + ahead >= tokHolder.size()) {
-    size_t loc = tokHolder.empty() ? 0 : tokHolder.back().loc;
-    auto [line, col] = translateOffset(source, loc);
+  if (pos + ahead >= state.tokHolder.size()) {
+    size_t loc = state.tokHolder.empty() ? 0 : state.tokHolder.back().loc;
+    auto [line, col] = translateOffset(state.fileSource, loc);
     throw IrParserException(line, col, "Unexpected end of file");
   }
 
-  return tokHolder.at(pos + ahead);
+  return state.tokHolder.at(pos + ahead);
 }
 
 Token IrParser::consume() {
-  if (pos >= tokHolder.size()) {
-    size_t loc = tokHolder.empty() ? 0 : tokHolder.back().loc;
-    auto [line, col] = translateOffset(source, loc);
+  if (pos >= state.tokHolder.size()) {
+    size_t loc = state.tokHolder.empty() ? 0 : state.tokHolder.back().loc;
+    auto [line, col] = translateOffset(state.fileSource, loc);
     throw IrParserException(line, col, "Unexpected end of file");
   }
 
-  return tokHolder.at(pos++);
+  return state.tokHolder.at(pos++);
 }
 
 Token IrParser::assertConsume(TokenKind kind) {
   Token tok = consume();
   if (tok.kind != kind) {
-    auto [line, col] = translateOffset(source, tok.loc);
+    auto [line, col] = translateOffset(state.fileSource, tok.loc);
     throw IrParserException(line, col, "Unexpected token");
   }
 
@@ -91,7 +91,7 @@ IrValue IrParser::parseValue() {
       return IrValueLiteral::newValue(type, std::stoull(tok.lexeme));
     }
     catch (const std::exception& err) {
-      auto [line, off] = translateOffset(source, tok.loc);
+      auto [line, off] = translateOffset(state.fileSource, tok.loc);
       throw IrParserException(line, off, "Invalid integer literal");
     }
   }
@@ -116,7 +116,7 @@ IrType IrParser::parseType() {
       }
     }
     catch (const std::exception& err) {
-      auto [line, off] = translateOffset(source, tok.loc);
+      auto [line, off] = translateOffset(state.fileSource, tok.loc);
       throw IrParserException(line, off, "Invalid size");
     }
     break;
@@ -146,7 +146,7 @@ IrStmt IrParser::parseStmt() {
     std::vector<IrParameter> params;
 
     if (!sym) {
-      auto [line, col] = translateOffset(source, peek(0).loc);
+      auto [line, col] = translateOffset(state.fileSource, peek(0).loc);
       throw IrParserException(line, col, "Expected symbol");
     }
 
@@ -161,7 +161,7 @@ IrStmt IrParser::parseStmt() {
       IrValueSSA* ssa = dynamic_cast<IrValueSSA*>(paramId.get());
 
       if (!ssa) {
-        auto [line, col] = translateOffset(source, peek(0).loc);
+        auto [line, col] = translateOffset(state.fileSource, peek(0).loc);
         throw IrParserException(line, col, "Expected SSA");
       }
 
@@ -174,9 +174,7 @@ IrStmt IrParser::parseStmt() {
 
     assertConsume(PAREN_CLOSE);
 
-    return IrStmtFunction::newStmt(
-      std::move(ret), std::move(*sym), std::move(params), {}, parseScope()
-    );
+    return IrStmtFunction::newStmt(std::move(ret), std::move(*sym), std::move(params), {}, parseScope());
   }
   case IDENT: {
     IrOpCode op;
@@ -208,13 +206,13 @@ void IrParser::parse() {
     while (true) {
       if (peek(0).kind == EOF_)
         break;
-      irHolder.data.push_back(parseStmt());
+      state.irHolder.data.push_back(parseStmt());
     }
   }
   catch (const IrParserException& err) {
-    state.fail = true;
-    spdlog::error("{}:{}:{}: {}", path, err.line, err.off, err.msg);
+    state.exitCode = 1;
+    spdlog::error("{}:{}:{}: {}", state.filePath, err.line, err.off, err.msg);
   }
 }
 
-} // namespace SIRF
+} // namespace sirf

@@ -19,7 +19,7 @@ BraceWrapping:
   BeforeCatch: true
 PackConstructorInitializers: Never
 BreakInheritanceList: BeforeComma
-ColumnLimit: 100
+ColumnLimit: 150
 IndentCaseLabels: false
 SortIncludes: false
 IndentWidth: 2

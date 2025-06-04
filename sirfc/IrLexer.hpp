@@ -7,7 +7,7 @@
 #include <Core/Common.hpp>
 #include "CState.hpp"
 
-namespace SIRF {
+namespace sirf {
 
 enum class TokenKind {
   ILL,
@@ -44,8 +44,7 @@ struct Token {
 class IrLexer final {
 public:
   explicit IrLexer(CState& state)
-    : holder(state.tokHolder),
-      source(state.fileSource) {}
+    : state(state) {}
 
   void tokenize();
 
@@ -63,11 +62,9 @@ private:
   size_t line = 0;
   size_t off = 0;
   size_t pos = 0;
-
-  TokenHolder& holder;
-  const std::string& source;
+  CState& state;
 };
 
-} // namespace SIRF
+} // namespace sirf
 
 #endif

@@ -3,14 +3,14 @@
 
 #include "IrLexer.hpp"
 
-#define IN_RANGE() pos < source.size()
-#define NEXT_CHAR()                                                                                \
-  {                                                                                                \
-    off++;                                                                                         \
-    pos++;                                                                                         \
+#define IN_RANGE() pos < state.fileSource.size()
+#define NEXT_CHAR()                                                                                                                                  \
+  {                                                                                                                                                  \
+    off++;                                                                                                                                           \
+    pos++;                                                                                                                                           \
   }
 
-namespace SIRF {
+namespace sirf {
 
 using enum TokenKind;
 
@@ -19,10 +19,10 @@ static bool isHexChar(char chr) {
 }
 
 char IrLexer::peek(int ahead) {
-  if (pos + ahead >= source.size()) {
+  if (pos + ahead >= state.fileSource.size()) {
     return '\0';
   }
-  return source.at(pos + ahead);
+  return state.fileSource.at(pos + ahead);
 }
 
 Token IrLexer::readNumber() {
@@ -79,10 +79,7 @@ Token IrLexer::readIdent() {
   auto is_allowed = [&](char chr) -> bool {
     bool is_alnum = std::isalnum(static_cast<unsigned char>(chr));
     bool is_special =
-      (std::ranges::find(
-         allowed_identifier_spec_chars.begin(), allowed_identifier_spec_chars.end(), chr
-       )
-       != allowed_identifier_spec_chars.end());
+      (std::ranges::find(allowed_identifier_spec_chars.begin(), allowed_identifier_spec_chars.end(), chr) != allowed_identifier_spec_chars.end());
     return is_alnum || is_special;
   };
 
@@ -166,7 +163,7 @@ Token IrLexer::nextToken() {
 
   size_t loc = pos;
 
-  if (pos >= source.size()) {
+  if (pos >= state.fileSource.size()) {
     return {loc, EOF_, "<eof>"};
   }
 
@@ -208,11 +205,11 @@ Token IrLexer::nextToken() {
 void IrLexer::tokenize() {
   while (true) {
     Token tok = nextToken();
-    holder.push_back(tok);
+    state.tokHolder.push_back(tok);
     if (tok.kind == EOF_) {
       break;
     }
   }
 }
 
-} // namespace SIRF
+} // namespace sirf

@@ -7,22 +7,21 @@
 #include <Core/Common.hpp>
 #include <IR/IrHolder.hpp>
 
-namespace SIRF {
+namespace sirf {
 
 struct Token;
 
 using TokenHolder = std::vector<Token>;
 
 struct CState {
-  bool fail;
-
-  const std::string filePath;
-  const std::string fileSource;
-
+  int exitCode = 0;
   IrHolder irHolder;
   TokenHolder tokHolder;
+  std::string filePath;
+  std::string fileSource;
+  std::string outputPath;
 };
 
-} // namespace SIRF
+} // namespace sirf
 
 #endif

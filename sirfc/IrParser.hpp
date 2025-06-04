@@ -24,7 +24,7 @@
 #include "IrLexer.hpp"
 #include "CState.hpp"
 
-namespace SIRF {
+namespace sirf {
 
 class IrParserException : public std::exception {
 public:
@@ -41,11 +41,7 @@ public:
 class IrParser final {
 public:
   explicit IrParser(CState& state)
-    : state(state),
-      irHolder(state.irHolder),
-      tokHolder(state.tokHolder),
-      path(state.filePath),
-      source(state.fileSource) {}
+    : state(state) {}
 
   void parse();
 
@@ -62,14 +58,9 @@ private:
 
 private:
   size_t pos = 0;
-
   CState& state;
-  IrHolder& irHolder;
-  const TokenHolder& tokHolder;
-  const std::string& path;
-  const std::string& source;
 };
 
-} // namespace SIRF
+} // namespace sirf
 
 #endif
