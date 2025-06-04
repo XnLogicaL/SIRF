@@ -3,7 +3,7 @@
 
 #include "IrLexer.hpp"
 
-#define IN_RANGE() pos < state.fileSource.size()
+#define IN_RANGE() pos < state.inputSource.size()
 #define NEXT_CHAR()                                                                                                                                  \
   {                                                                                                                                                  \
     off++;                                                                                                                                           \
@@ -19,10 +19,10 @@ static bool isHexChar(char chr) {
 }
 
 char IrLexer::peek(int ahead) {
-  if (pos + ahead >= state.fileSource.size()) {
+  if (pos + ahead >= state.inputSource.size()) {
     return '\0';
   }
-  return state.fileSource.at(pos + ahead);
+  return state.inputSource.at(pos + ahead);
 }
 
 Token IrLexer::readNumber() {
@@ -163,7 +163,7 @@ Token IrLexer::nextToken() {
 
   size_t loc = pos;
 
-  if (pos >= state.fileSource.size()) {
+  if (pos >= state.inputSource.size()) {
     return {loc, EOF_, "<eof>"};
   }
 

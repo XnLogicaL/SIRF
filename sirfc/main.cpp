@@ -82,8 +82,8 @@ static constexpr int emitAssembly(sirf::CState& state) {
 }
 
 static constexpr int emitExecutable(sirf::CState& state, bool fnoclean) {
-  auto spath = state.filePath + ".s";
-  auto opath = state.filePath + ".o";
+  auto spath = state.inputPath + ".s";
+  auto opath = state.inputPath + ".o";
 
   sirf::AsmGenerator gen(state.irHolder);
   std::ofstream ofs(spath);
@@ -151,18 +151,19 @@ static constexpr int emitTtree(sirf::CState& state) {
 static constexpr int _main_impl(int argc, char** argv) {
   spdlog::set_pattern("sirfc: %^%l:%$ %v");
 
-  argparse::ArgumentParser program("sirfc");
+  argparse::ArgumentParser cli("sirfc");
   // core args
-  program.add_argument("input").required();
-  program.add_argument("-o", "--output").default_value("a").nargs(1);
-  program.add_argument("-e", "--emit").default_value("exe").nargs(1);
+  cli.add_argument("input").required().help("target source file containing SIRF IR (text format)");
+  cli.add_argument("-o", "--output").default_value("a").nargs(1).help("target output file path");
+  cli.add_argument("-e", "--emit").default_value("exe").nargs(1).choices("list", "asm", "exe", "ttree", "ttree_json").help("emission target type");
 
   // flags
-  program.add_argument("-v", "--verbose").flag();
-  program.add_argument("-no-clean", "--no-cleanup").flag();
+  cli.add_argument("-V", "--verbose").flag().help("enable verbose output");
+  cli.add_argument("-no-clean", "--no-cleanup").flag().help("disable intermediate compilation artifact cleaning");
+  cli.add_argument("-O", "--optimize").default_value(0).nargs(1).choices(0, 1, 2, 3).help("optimization level");
 
   try {
-    program.parse_args(argc, argv);
+    cli.parse_args(argc, argv);
   }
   catch (const std::exception& err) {
     spdlog::error(err.what());
@@ -170,18 +171,18 @@ static constexpr int _main_impl(int argc, char** argv) {
   }
 
   // CLI flags
-  bool fverbose = program.get<bool>("-v");
-  bool fnoclean = program.get<bool>("-no-clean");
+  bool fverbose = cli.get<bool>("-v");
+  bool fnoclean = cli.get<bool>("-no-clean");
 
-  EmitTarget et = magic_enum::enum_cast<EmitTarget>(program.get("-e")).value_or(EmitTarget::none);
+  EmitTarget et = magic_enum::enum_cast<EmitTarget>(cli.get("-e")).value_or(EmitTarget::none);
   if (et == EmitTarget::none) {
     spdlog::error("invalid emit target");
     return 1;
   }
 
   sirf::CState state;
-  state.filePath = program.get("input");
-  state.outputPath = program.get("-o");
+  state.inputPath = cli.get("input");
+  state.outputPath = cli.get("-o");
 
   // check for default output path
   if (state.outputPath == "a") {
@@ -192,15 +193,15 @@ static constexpr int _main_impl(int argc, char** argv) {
   sirf::IrParser parser(state);
 
   // read input file
-  std::ifstream ifs(state.filePath);
+  std::ifstream ifs(state.inputPath);
   if (!ifs.is_open()) {
-    spdlog::error("target: failed to open file '{}'", state.filePath);
+    spdlog::error("target: failed to open file '{}'", state.inputPath);
     return 1;
   }
 
   std::string line;
   while (std::getline(ifs, line)) {
-    state.fileSource += line + '\n';
+    state.inputSource += line + '\n';
   }
 
   // lex & parse input file

@@ -17,8 +17,8 @@ struct CState {
   int exitCode = 0;
   IrHolder irHolder;
   TokenHolder tokHolder;
-  std::string filePath;
-  std::string fileSource;
+  std::string inputPath;
+  std::string inputSource;
   std::string outputPath;
 };
 

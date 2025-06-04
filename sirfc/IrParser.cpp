@@ -33,7 +33,7 @@ static std::pair<size_t, size_t> translateOffset(const std::string& source, size
 Token IrParser::peek(int ahead) {
   if (pos + ahead >= state.tokHolder.size()) {
     size_t loc = state.tokHolder.empty() ? 0 : state.tokHolder.back().loc;
-    auto [line, col] = translateOffset(state.fileSource, loc);
+    auto [line, col] = translateOffset(state.inputSource, loc);
     throw IrParserException(line, col, "Unexpected end of file");
   }
 
@@ -43,7 +43,7 @@ Token IrParser::peek(int ahead) {
 Token IrParser::consume() {
   if (pos >= state.tokHolder.size()) {
     size_t loc = state.tokHolder.empty() ? 0 : state.tokHolder.back().loc;
-    auto [line, col] = translateOffset(state.fileSource, loc);
+    auto [line, col] = translateOffset(state.inputSource, loc);
     throw IrParserException(line, col, "Unexpected end of file");
   }
 
@@ -53,7 +53,7 @@ Token IrParser::consume() {
 Token IrParser::assertConsume(TokenKind kind) {
   Token tok = consume();
   if (tok.kind != kind) {
-    auto [line, col] = translateOffset(state.fileSource, tok.loc);
+    auto [line, col] = translateOffset(state.inputSource, tok.loc);
     throw IrParserException(line, col, "Unexpected token");
   }
 
@@ -91,7 +91,7 @@ IrValue IrParser::parseValue() {
       return IrValueLiteral::newValue(type, std::stoull(tok.lexeme));
     }
     catch (const std::exception& err) {
-      auto [line, off] = translateOffset(state.fileSource, tok.loc);
+      auto [line, off] = translateOffset(state.inputSource, tok.loc);
       throw IrParserException(line, off, "Invalid integer literal");
     }
   }
@@ -116,7 +116,7 @@ IrType IrParser::parseType() {
       }
     }
     catch (const std::exception& err) {
-      auto [line, off] = translateOffset(state.fileSource, tok.loc);
+      auto [line, off] = translateOffset(state.inputSource, tok.loc);
       throw IrParserException(line, off, "Invalid size");
     }
     break;
@@ -146,7 +146,7 @@ IrStmt IrParser::parseStmt() {
     std::vector<IrParameter> params;
 
     if (!sym) {
-      auto [line, col] = translateOffset(state.fileSource, peek(0).loc);
+      auto [line, col] = translateOffset(state.inputSource, peek(0).loc);
       throw IrParserException(line, col, "Expected symbol");
     }
 
@@ -161,7 +161,7 @@ IrStmt IrParser::parseStmt() {
       IrValueSSA* ssa = dynamic_cast<IrValueSSA*>(paramId.get());
 
       if (!ssa) {
-        auto [line, col] = translateOffset(state.fileSource, peek(0).loc);
+        auto [line, col] = translateOffset(state.inputSource, peek(0).loc);
         throw IrParserException(line, col, "Expected SSA");
       }
 
@@ -211,7 +211,7 @@ void IrParser::parse() {
   }
   catch (const IrParserException& err) {
     state.exitCode = 1;
-    spdlog::error("{}:{}:{}: {}", state.filePath, err.line, err.off, err.msg);
+    spdlog::error("{}:{}:{}: {}", state.inputPath, err.line, err.off, err.msg);
   }
 }
 
