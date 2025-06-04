@@ -20,7 +20,7 @@
 enum class EmitTarget {
   none = 0,
   list,
-  asm_,
+  as,
   exe,
   ttree,
   ttree_json,
@@ -28,7 +28,7 @@ enum class EmitTarget {
 
 static void listEmitTargets() {
   spdlog::info("Emission targets:");
-  std::cout << "  -e asm                  raw assembly (platform specific)\n"
+  std::cout << "  -e as                   raw assembly (platform specific)\n"
             << "  -e exe                  linked executable binary (platform specific)\n"
             << "  -e ttree                tokenized representation\n"
             << "  -e ttree_json           tokenized representation in json format\n";
@@ -53,7 +53,7 @@ static constexpr const char* getBinFormat() {
 
 static constexpr const char* getTargetExtension(EmitTarget target) {
   switch (target) {
-  case EmitTarget::asm_:
+  case EmitTarget::as:
     return ".s";
   case EmitTarget::exe:
 #if defined(__linux__) || defined(__apple__)
@@ -155,7 +155,7 @@ static constexpr int _main_impl(int argc, char** argv) {
   // core args
   cli.add_argument("input").required().help("target source file containing SIRF IR (text format)");
   cli.add_argument("-o", "--output").default_value("a").nargs(1).help("target output file path");
-  cli.add_argument("-e", "--emit").default_value("exe").nargs(1).choices("list", "asm", "exe", "ttree", "ttree_json").help("emission target type");
+  cli.add_argument("-e", "--emit").default_value("exe").nargs(1).choices("list", "as", "exe", "ttree", "ttree_json").help("emission target type");
 
   // flags
   cli.add_argument("-V", "--verbose").flag().help("enable verbose output");
@@ -222,7 +222,7 @@ static constexpr int _main_impl(int argc, char** argv) {
     break;
   case EmitTarget::exe:
     return emitExecutable(state, fnoclean);
-  case EmitTarget::asm_:
+  case EmitTarget::as:
     return emitAssembly(state);
   case EmitTarget::ttree:
     return emitTtree<false>(state);
