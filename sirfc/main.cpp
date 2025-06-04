@@ -23,13 +23,15 @@ enum class EmitTarget {
   asm_,
   exe,
   ttree,
+  ttree_json,
 };
 
 static void listEmitTargets() {
   spdlog::info("Emission targets:");
-  std::cout << "  asm      raw assembly (platform specific)\n"
-            << "  exe      linked executable binary (platform specific)\n"
-            << "  ttree    tokenized representation\n";
+  std::cout << "  -e asm                  raw assembly (platform specific)\n"
+            << "  -e exe                  linked executable binary (platform specific)\n"
+            << "  -e ttree                tokenized representation\n"
+            << "  -e ttree_json           tokenized representation in json format\n";
 }
 
 template<typename... Args>
@@ -57,8 +59,12 @@ static constexpr const char* getTargetExtension(EmitTarget target) {
 #if defined(__linux__) || defined(__apple__)
     return ".out";
 #elif defined(_WIN32)
-    return ".exe"
+  return ".exe"
 #endif
+  case EmitTarget::ttree:
+    return ".tt";
+  case EmitTarget::ttree_json:
+    return ".json";
   default:
     break;
   }
@@ -106,13 +112,37 @@ cleanup:
   return result;
 }
 
+template<bool emitJSON>
 static constexpr int emitTtree(sirf::CState& state) {
-  for (const sirf::Token& tok : state.tokHolder) {
-    // clang-format off
-    std::cout << '(' << std::setw(12) << std::setfill(' ') << std::left << magic_enum::enum_name(tok.kind) << ", '"
-      << tok.lexeme << "', "
-      << std::setw(3) << std::setfill('0') << tok.loc << ")\n";
-    // clang-format on
+  std::ofstream ofs(state.outputPath);
+
+  if constexpr (emitJSON) {
+    ofs << "[\n";
+  }
+
+  const auto emitTokenJSON = [&](const sirf::Token& tok, bool is_last) {
+    ofs << "  { \"kind\": \"" << magic_enum::enum_name(tok.kind) << "\", \"lexeme\": \"" << tok.lexeme << "\", \"pos\": " << tok.loc << " }";
+    if (!is_last)
+      ofs << ",";
+    ofs << "\n";
+  };
+
+  const auto emitTokenTup = [&](const sirf::Token& tok) {
+    ofs << '(' << std::setw(12) << std::left << magic_enum::enum_name(tok.kind) << ", '" << tok.lexeme << "', " << std::setw(3) << std::setfill('0')
+        << tok.loc << ")\n";
+  };
+
+  const std::size_t count = state.tokHolder.size();
+  for (std::size_t i = 0; i < count; ++i) {
+    const auto& tok = state.tokHolder[i];
+    if constexpr (emitJSON)
+      emitTokenJSON(tok, i + 1 == count);
+    else
+      emitTokenTup(tok);
+  }
+
+  if constexpr (emitJSON) {
+    ofs << "]\n";
   }
 
   return 0;
@@ -194,7 +224,9 @@ static constexpr int _main_impl(int argc, char** argv) {
   case EmitTarget::asm_:
     return emitAssembly(state);
   case EmitTarget::ttree:
-    return emitTtree(state);
+    return emitTtree<false>(state);
+  case EmitTarget::ttree_json:
+    return emitTtree<true>(state);
   default:
     spdlog::error("unknown emit target\n");
     listEmitTargets();
