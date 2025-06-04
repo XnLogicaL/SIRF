@@ -9,6 +9,7 @@
 #include <IR/IrValues.hpp>
 #include <IR/IrTypes.hpp>
 #include <IR/IrStmts.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #define SIRF_CHECKVIRT(type, name, target) (const type* name = dynamic_cast<const type*>(target.get()))
 

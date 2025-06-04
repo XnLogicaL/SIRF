@@ -5,6 +5,7 @@
 #include <IR/IrValueLiteral.hpp>
 #include <IR/IrTypeSized.hpp>
 #include <cassert>
+#include <cmath>
 
 namespace sirf {
 
@@ -75,14 +76,15 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     section_text << "  ret\n";
   }
   else if SIRF_CHECKVIRT (IrStmtInstruction, insn, stat) {
+    using enum IrOpCode;
+
     switch (insn->op) {
-    case IrOpCode::RET: {
+    case RET: {
       if (!insn->ops.empty()) {
         const IrValue& retv = insn->ops.at(0);
         if SIRF_CHECKVIRT (IrValueLiteral, lit, retv) {
           if SIRF_CHECKVIRT (IrTypeSized, sized, lit->type) {
-            section_text << "  mov "
-                         << "rax, " << lit->value << "\n";
+            section_text << "  mov rax, " << lit->value << "\n";
           }
         }
       }
@@ -91,12 +93,28 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
         section_text << "  jmp .L" << currentFunction->id.id << ".epilogue\n";
       }
     } break;
-    case IrOpCode::MOV: {
-      if (insn->ops.size() >= 2) {
-        auto a = generateValue_x86_64(insn->ops[0]);
-        auto b = generateValue_x86_64(insn->ops[1]);
-        section_text << "  mov " << a << ", " << b << "\n";
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case MOV: {
+      auto a = generateValue_x86_64(insn->ops[0]);
+      auto opName = std::string(magic_enum::enum_name(insn->op));
+      std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+
+      // attempt mul/div strength reduction
+      if (insn->op == MUL || insn->op == DIV) {
+        if SIRF_CHECKVIRT (IrValueLiteral, lit, insn->ops[1]) {
+          if (lit->value > 0 && (lit->value & (lit->value - 1)) == 0) {
+            int shift = static_cast<int>(std::log2(lit->value));
+            section_text << (insn->op == MUL ? "  shl " : "  shr ") << a << ", " << shift << "\n";
+            break;
+          }
+        }
       }
+
+      auto b = generateValue_x86_64(insn->ops[1]);
+      section_text << "  " << opName << ' ' << a << ", " << b << "\n";
     } break;
     default:
       break;

@@ -5,6 +5,9 @@ fun i32 @add(%a i32, %b i32) {
     mov r11, 69 i32
     mov r29, 62823 i32
     mov r11, 35 i32
+    add r29, r11
+    sub r11, 591 i32
+    div r11, 16 i32
     ret 0 i32
 }
 

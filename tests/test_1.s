@@ -10,6 +10,9 @@ add:
   sub rsp, 8                    ; r29 spill
   mov qword [rbp-16], 62823
   mov qword [rbp-8], 35
+  add qword [rbp-16], qword [rbp-8]
+  sub qword [rbp-8], 591
+  shr qword [rbp-8], 4
   mov rax, 0
   jmp .Ladd.epilogue
 .Ladd.epilogue:
