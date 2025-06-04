@@ -4,23 +4,9 @@
 #ifndef SIRFC_IRPARSER_HPP
 #define SIRFC_IRPARSER_HPP
 
-#include <cassert>
-#include <exception>
-#include <spdlog/spdlog.h>
-#include <Core/Common.hpp>
-#include <IR/IrStmtAssign.hpp>
-#include <IR/IrStmtDeclaration.hpp>
-#include <IR/IrStmtFunction.hpp>
-#include <IR/IrStmtInstruction.hpp>
-#include <IR/IrValueRegister.hpp>
-#include <IR/IrValueSSA.hpp>
-#include <IR/IrValueLiteral.hpp>
-#include <IR/IrValueSymbol.hpp>
-#include <IR/IrValueLabel.hpp>
-#include <IR/IrValuePtr.hpp>
-#include <IR/IrTypeSized.hpp>
-#include <IR/IrTypePtr.hpp>
-#include <IR/IrHolder.hpp>
+#include <IR/IrValues.hpp>
+#include <IR/IrTypes.hpp>
+#include <IR/IrStmts.hpp>
 #include "IrLexer.hpp"
 #include "CState.hpp"
 

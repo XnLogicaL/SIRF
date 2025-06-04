@@ -5,16 +5,9 @@
 #define SIRF_IRANALYZER_HPP
 
 #include <Core/Common.hpp>
-#include <IR/IrStmtAssign.hpp>
-#include <IR/IrStmtDeclaration.hpp>
-#include <IR/IrStmtFunction.hpp>
-#include <IR/IrStmtInstruction.hpp>
-#include <IR/IrValueRegister.hpp>
-#include <IR/IrValueSSA.hpp>
-#include <IR/IrValueLiteral.hpp>
-#include <IR/IrValueSymbol.hpp>
-#include <IR/IrValueLabel.hpp>
-#include <IR/IrValuePtr.hpp>
+#include <IR/IrValues.hpp>
+#include <IR/IrTypes.hpp>
+#include <IR/IrStmts.hpp>
 #include <IR/IrHolder.hpp>
 
 namespace sirf {

@@ -5,6 +5,8 @@
 #define SIRF_COMMON_HPP
 
 #include <cstdint>
+#include <cstddef>
+#include <cstdlib>
 #include <string>
 #include <vector>
 #include <memory>
@@ -13,6 +15,7 @@
 #include <variant>
 #include <format>
 #include <unordered_map>
+#include <exception>
 
 #include "APIConfig.hpp"
 #include "APIMacros.hpp"
