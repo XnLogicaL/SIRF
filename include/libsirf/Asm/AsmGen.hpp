@@ -6,11 +6,11 @@
 
 #include <Core/Common.hpp>
 #include <IR/IrHolder.hpp>
-#include <IR/IrStmtAssign.hpp>
-#include <IR/IrStmtDeclaration.hpp>
-#include <IR/IrStmtFunction.hpp>
-#include <IR/IrStmtInstruction.hpp>
-#include <IR/IrStmtLabel.hpp>
+#include <IR/IrValues.hpp>
+#include <IR/IrTypes.hpp>
+#include <IR/IrStmts.hpp>
+
+#define SIRF_CHECKVIRT(type, name, target) (const type* name = dynamic_cast<const type*>(target.get()))
 
 namespace sirf {
 
@@ -22,11 +22,19 @@ public:
   std::string generate();
 
 private:
-  void generateTarget_x86_64(const IrStmt& stat);
+  int getSizeOf(const IrValue& val);
+
+  std::string getSizePrefix(int size);
+
+  std::string generateRegister_x86_64(const IrValueRegister& reg);
+  std::string generateValue_x86_64(const IrValue& val);
+
+  void generateStmt_x86_64(const IrStmt& stat);
 
 private:
   const IrHolder& holder;
 
+  size_t spillOffset = 0;
   const IrStmtFunction* currentFunction = NULL;
 
   std::ostringstream section_data;

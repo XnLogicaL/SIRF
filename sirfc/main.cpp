@@ -151,16 +151,38 @@ static constexpr int emitTtree(sirf::CState& state) {
 static constexpr int _main_impl(int argc, char** argv) {
   spdlog::set_pattern("sirfc: %^%l:%$ %v");
 
+  // clang-format off
   argparse::ArgumentParser cli("sirfc");
-  // core args
-  cli.add_argument("input").required().help("target source file containing SIRF IR (text format)");
-  cli.add_argument("-o", "--output").default_value("a").nargs(1).help("target output file path");
-  cli.add_argument("-e", "--emit").default_value("exe").nargs(1).choices("list", "as", "exe", "ttree", "ttree_json").help("emission target type");
 
-  // flags
-  cli.add_argument("-V", "--verbose").flag().help("enable verbose output");
-  cli.add_argument("-no-clean", "--no-cleanup").flag().help("disable intermediate compilation artifact cleaning");
-  cli.add_argument("-O", "--optimize").default_value(0).nargs(1).choices(0, 1, 2, 3).help("optimization level");
+  cli.add_argument("input")
+    .required()
+    .help("target source file containing SIRF IR (text format)");
+  
+  cli.add_argument("-o", "--output")
+    .default_value("a")
+    .nargs(1)
+    .help("target output file path");
+  
+  cli.add_argument("-e", "--emit")
+    .default_value("exe")
+    .nargs(1)
+    .choices("list", "as", "exe", "ttree", "ttree_json")
+    .help("emission target type");
+
+  cli.add_argument("-V", "--verbose")
+    .flag()
+    .help("enable verbose output");
+  
+  cli.add_argument("-no-clean", "--no-cleanup")
+    .flag()
+    .help("disable intermediate compilation artifact cleaning");
+  
+  cli.add_argument("-O", "--optimize")
+    .default_value(0)
+    .nargs(1)
+    .choices(0, 1, 2, 3)
+    .help("optimization level");
+  // clang-format on
 
   try {
     cli.parse_args(argc, argv);

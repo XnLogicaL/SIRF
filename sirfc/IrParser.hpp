@@ -4,6 +4,7 @@
 #ifndef SIRFC_IRPARSER_HPP
 #define SIRFC_IRPARSER_HPP
 
+#include <magic_enum/magic_enum.hpp>
 #include <IR/IrValues.hpp>
 #include <IR/IrTypes.hpp>
 #include <IR/IrStmts.hpp>

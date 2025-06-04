@@ -34,7 +34,7 @@ Token IrParser::peek(int ahead) {
   if (pos + ahead >= state.tokHolder.size()) {
     size_t loc = state.tokHolder.empty() ? 0 : state.tokHolder.back().loc;
     auto [line, col] = translateOffset(state.inputSource, loc);
-    throw IrParserException(line, col, "Unexpected end of file");
+    throw IrParserException(line, col, "unexpected end of file");
   }
 
   return state.tokHolder.at(pos + ahead);
@@ -44,7 +44,7 @@ Token IrParser::consume() {
   if (pos >= state.tokHolder.size()) {
     size_t loc = state.tokHolder.empty() ? 0 : state.tokHolder.back().loc;
     auto [line, col] = translateOffset(state.inputSource, loc);
-    throw IrParserException(line, col, "Unexpected end of file");
+    throw IrParserException(line, col, "unexpected end of file");
   }
 
   return state.tokHolder.at(pos++);
@@ -54,7 +54,7 @@ Token IrParser::assertConsume(TokenKind kind) {
   Token tok = consume();
   if (tok.kind != kind) {
     auto [line, col] = translateOffset(state.inputSource, tok.loc);
-    throw IrParserException(line, col, "Unexpected token");
+    throw IrParserException(line, col, "unexpected token");
   }
 
   return tok;
@@ -92,9 +92,22 @@ IrValue IrParser::parseValue() {
     }
     catch (const std::exception& err) {
       auto [line, off] = translateOffset(state.inputSource, tok.loc);
-      throw IrParserException(line, off, "Invalid integer literal");
+      throw IrParserException(line, off, "invalid integer literal");
     }
-  }
+  } break;
+  case IDENT: {
+    if (tok.lexeme[0] == 'r') {
+      auto ids = tok.lexeme.substr(1, tok.lexeme.size() - 1);
+      try {
+        uint32_t id = std::stol(ids);
+        return IrValueRegister::newValue(id, IrRegisterKind::QWORD);
+      }
+      catch (const std::exception& err) {
+        auto [line, off] = translateOffset(state.inputSource, tok.loc);
+        throw IrParserException(line, off, "invalid register id");
+      }
+    }
+  } break;
   default:
     break;
   }
@@ -117,7 +130,7 @@ IrType IrParser::parseType() {
     }
     catch (const std::exception& err) {
       auto [line, off] = translateOffset(state.inputSource, tok.loc);
-      throw IrParserException(line, off, "Invalid size");
+      throw IrParserException(line, off, "invalid type id");
     }
     break;
   }
@@ -177,10 +190,14 @@ IrStmt IrParser::parseStmt() {
     return IrStmtFunction::newStmt(std::move(ret), std::move(*sym), std::move(params), {}, parseScope());
   }
   case IDENT: {
-    IrOpCode op;
-    // clang-format off
-    if (tok.lexeme == "ret") op = IrOpCode::RET;
-    // clang-format on
+    std::string realOp = tok.lexeme;
+    std::transform(tok.lexeme.begin(), tok.lexeme.end(), realOp.begin(), ::toupper);
+
+    auto op = magic_enum::enum_cast<IrOpCode>(realOp);
+    if (!op.has_value()) {
+      auto [line, col] = translateOffset(state.inputSource, tok.loc);
+      throw IrParserException(line, col, "unrecognized opcode");
+    }
 
     std::vector<IrValue> ops;
     while (true) {
@@ -191,7 +208,7 @@ IrStmt IrParser::parseStmt() {
         break;
     }
 
-    return IrStmtInstruction::newStmt(op, std::move(ops));
+    return IrStmtInstruction::newStmt(*op, std::move(ops));
   }
   default:
     break;

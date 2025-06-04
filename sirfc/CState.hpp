@@ -10,7 +10,6 @@
 namespace sirf {
 
 struct Token;
-
 using TokenHolder = std::vector<Token>;
 
 struct CState {

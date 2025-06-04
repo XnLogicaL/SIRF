@@ -14,6 +14,7 @@
 #include <optional>
 #include <variant>
 #include <format>
+#include <iostream>
 #include <unordered_map>
 #include <exception>
 

@@ -22,10 +22,37 @@ static constexpr LinkerId getLinkerId() {
   return LNONE;
 }
 
+int AsmGenerator::getSizeOf(const IrValue& val) {
+  if SIRF_CHECKVIRT (IrValueLiteral, lit, val) {
+    if SIRF_CHECKVIRT (IrTypeSized, size, lit->type) {
+      return size->size;
+    }
+  }
+
+  return -1;
+}
+
+std::string AsmGenerator::getSizePrefix(int size) {
+  switch (size) {
+  case 8:
+    return "byte";
+  case 16:
+    return "word";
+  case 32:
+    return "dword";
+  case 64:
+    return "qword";
+  default:
+    break;
+  }
+
+  return "";
+}
+
 std::string AsmGenerator::generate() {
   for (const IrStmt& stat : holder.data) {
 #ifdef __x86_64__
-    generateTarget_x86_64(stat);
+    generateStmt_x86_64(stat);
 #else
 #error "Unsupported target"
 #endif

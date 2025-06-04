@@ -1,6 +1,10 @@
 global @main
 
 fun i32 @add(%a i32, %b i32) {
+    mov r0, 10 i32
+    mov r11, 69 i32
+    mov r29, 62823 i32
+    mov r11, 35 i32
     ret 0 i32
 }
 
