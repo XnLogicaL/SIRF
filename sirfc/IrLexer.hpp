@@ -20,6 +20,7 @@ enum class TokenKind {
   PERCENT,
   CARET,
   COMMA,
+  EQUALS,
   AT,
 
   IDENT,

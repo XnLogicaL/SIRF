@@ -5,6 +5,7 @@
 #define SIRFC_IRPARSER_HPP
 
 #include <magic_enum/magic_enum.hpp>
+#include <spdlog/spdlog.h>
 #include <IR/IrValues.hpp>
 #include <IR/IrTypes.hpp>
 #include <IR/IrStmts.hpp>
@@ -15,14 +16,24 @@ namespace sirf {
 
 class IrParserException : public std::exception {
 public:
-  size_t line;
-  size_t off;
-  const char* msg;
+  const size_t line;
+  const size_t off;
+  const std::string msg;
 
-  IrParserException(size_t line, size_t off, const char* msg)
+  explicit IrParserException(size_t line, size_t off, std::string msg)
     : line(line),
       off(off),
       msg(msg) {}
+
+  template<typename... Args>
+  explicit IrParserException(size_t line, size_t off, std::format_string<Args...> fmt, Args&&... args)
+    : line(line),
+      off(off),
+      msg(std::format(fmt, std::forward<Args>(args)...)) {}
+
+  const char* what() const throw() {
+    return msg.c_str();
+  }
 };
 
 class IrParser final {

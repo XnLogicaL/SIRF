@@ -9,10 +9,11 @@
 
 namespace sirf {
 
-std::string AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
-  static std::unordered_map<uint32_t, size_t> regStackOffsetMap;
+using enum StkIdKind;
+using enum IrRegisterKind;
 
-  if (reg.kind == IrRegisterKind::QWORD) {
+std::string AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
+  if (reg.kind == QWORD) {
     static std::unordered_map<uint32_t, const char*> regMap = {
       {0, "rax"},
       {1, "rbx"},
@@ -30,11 +31,12 @@ std::string AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
       return it->second;
   }
 
-  if (auto it = regStackOffsetMap.find(reg.id); it != regStackOffsetMap.end())
-    return std::format("qword [rbp-{}]", it->second);
+  auto& currentMap = stackMap.back();
+  if (auto it = currentMap.find(reg.id); it != currentMap.end() && it->second.kind == registerSpill)
+    return std::format("qword [rbp-{}]", it->second.u.reg.offset);
 
   spillOffset += 8;
-  regStackOffsetMap[reg.id] = spillOffset;
+  currentMap[reg.id] = {registerSpill, {.reg = {spillOffset}}};
   section_text << "  sub rsp, 8                    ; r" << reg.id << " spill\n";
   return std::format("qword [rbp-{}]", spillOffset);
 }
@@ -58,18 +60,20 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     section_text << "  push rbp\n";
     section_text << "  mov rbp, rsp\n";
 
-    const int oldrsp = spillOffset;
+    const size_t oldSpillOffset = spillOffset;
     const IrStmtFunction* oldFun = currentFunction;
 
     spillOffset = 0;
     currentFunction = fun;
+    stackMap.push_back({});
 
     for (const IrStmt& bodyStat : fun->body) {
       generateStmt_x86_64(bodyStat);
     }
 
-    spillOffset = oldrsp;
+    spillOffset = oldSpillOffset;
     currentFunction = oldFun;
+    stackMap.pop_back();
 
     section_text << ".L" << fun->id.id << ".epilogue:\n";
     section_text << "  pop rbp\n";
@@ -123,6 +127,9 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
   else if SIRF_CHECKVIRT (IrStmtLabel, lb, stat) {
     section_text << lb->label.id << ":\n";
   }
+
+  SIRF_TODO();
+  SIRF_UNREACHABLE();
 }
 
 std::string AsmGenerator::generateValue_x86_64(const IrValue& val) {
@@ -131,7 +138,7 @@ std::string AsmGenerator::generateValue_x86_64(const IrValue& val) {
   else if SIRF_CHECKVIRT (IrValueRegister, reg, val)
     return generateRegister_x86_64(*reg);
 
-  assert(false);
+  SIRF_TODO();
   SIRF_UNREACHABLE();
 }
 

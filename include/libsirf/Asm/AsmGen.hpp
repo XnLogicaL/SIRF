@@ -15,6 +15,27 @@
 
 namespace sirf {
 
+enum class StkIdKind {
+  registerSpill,
+  variable,
+};
+
+struct StkReg {
+  size_t offset;
+};
+
+struct StkVar {
+  size_t offset;
+};
+
+struct StkId {
+  StkIdKind kind;
+  union {
+    StkReg reg;
+    StkVar var;
+  } u;
+};
+
 class AsmGenerator {
 public:
   explicit AsmGenerator(const IrHolder& holder)
@@ -36,7 +57,10 @@ private:
   const IrHolder& holder;
 
   size_t spillOffset = 0;
+
   const IrStmtFunction* currentFunction = NULL;
+
+  std::vector<std::unordered_map<uint32_t, StkId>> stackMap;
 
   std::ostringstream section_data;
   std::ostringstream section_text;

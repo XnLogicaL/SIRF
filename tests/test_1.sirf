@@ -1,16 +1,16 @@
 global @main
 
 fun i32 @add(%a i32, %b i32) {
-    mov r0, 10 i32
-    mov r11, 69 i32
-    mov r29, 62823 i32
-    mov r11, 35 i32
+    mov r0, i32 10
+    mov r11, i32 69
+    mov r29, i32 100
+    mov r11, i32 35
     add r29, r11
-    sub r11, 591 i32
-    div r11, 16 i32
-    ret 0 i32
+    sub r11, i32 591
+    div r11, i32 16
+    ret i32 0
 }
 
 fun i32 @main(%argc i32, %argv ^^i8) {
-    ret 0 i32
+    ret i32 0
 }
