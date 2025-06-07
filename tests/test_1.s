@@ -15,7 +15,7 @@ add:
   add qword [rbp-16], r11
   sub qword [rbp-8], 591
   shr qword [rbp-8], 4
-  mov rax, 0
+  mov rax, [rbp-8]
   jmp .Ladd.epilogue
 .Ladd.epilogue:
   pop rbx

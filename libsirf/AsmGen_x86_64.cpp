@@ -87,16 +87,12 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     case RET: {
       if (!insn->ops.empty()) {
         const IrValue& retv = insn->ops.at(0);
-        if SIRF_CHECKVIRT (IrValueLiteral, lit, retv) {
-          if SIRF_CHECKVIRT (IrTypeSized, sized, lit->type) {
-            section_text << "  mov rax, " << lit->value << "\n";
-          }
-        }
+        const ValueRepr src = generateValue_x86_64(retv);
+        section_text << "  mov rax, " << src.val << "\n";
       }
 
-      if (currentFunction) {
+      if (currentFunction)
         section_text << "  jmp .L" << currentFunction->id.id << ".epilogue\n";
-      }
     } break;
     case ADD:
     case SUB:
