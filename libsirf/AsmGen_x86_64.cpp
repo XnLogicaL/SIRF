@@ -12,7 +12,7 @@ namespace sirf {
 using enum StkIdKind;
 using enum IrRegisterKind;
 
-std::string AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
+ValueRepr AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
   if (reg.kind == QWORD) {
     static std::unordered_map<uint32_t, const char*> regMap = {
       {0, "rax"},
@@ -24,21 +24,20 @@ std::string AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
       {6, "r8"},
       {7, "r9"},
       {8, "r10"},
-      {9, "r11"},
     };
 
     if (auto it = regMap.find(reg.id); it != regMap.end())
-      return it->second;
+      return {it->second, false};
   }
 
   auto& currentMap = stackMap.back();
   if (auto it = currentMap.find(reg.id); it != currentMap.end() && it->second.kind == registerSpill)
-    return std::format("qword [rbp-{}]", it->second.u.reg.offset);
+    return {std::format("[rbp-{}]", it->second.u.reg.offset), true};
 
   spillOffset += 8;
   currentMap[reg.id] = {registerSpill, {.reg = {spillOffset}}};
   section_text << "  sub rsp, 8                    ; r" << reg.id << " spill\n";
-  return std::format("qword [rbp-{}]", spillOffset);
+  return {std::format("[rbp-{}]", spillOffset), true};
 }
 
 void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
@@ -57,6 +56,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
   }
   else if SIRF_CHECKVIRT (IrStmtFunction, fun, stat) {
     section_text << fun->id.id << ":\n";
+    section_text << "  push rbx\n";
     section_text << "  push rbp\n";
     section_text << "  mov rbp, rsp\n";
 
@@ -76,6 +76,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     stackMap.pop_back();
 
     section_text << ".L" << fun->id.id << ".epilogue:\n";
+    section_text << "  pop rbx\n";
     section_text << "  pop rbp\n";
     section_text << "  ret\n";
   }
@@ -102,23 +103,35 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     case MUL:
     case DIV:
     case MOV: {
-      auto a = generateValue_x86_64(insn->ops[0]);
-      auto opName = std::string(magic_enum::enum_name(insn->op));
-      std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+      ValueRepr dst = generateValue_x86_64(insn->ops[0]);
+      if (dst.isPointer) {
+        const int size = getSizeOf(insn->ops[0]);
+        std::string spec = getSizePrefix(size);
+        dst.val = spec + ' ' + dst.val;
+      }
 
       // attempt mul/div strength reduction
       if (insn->op == MUL || insn->op == DIV) {
         if SIRF_CHECKVIRT (IrValueLiteral, lit, insn->ops[1]) {
           if (lit->value > 0 && (lit->value & (lit->value - 1)) == 0) {
             int shift = static_cast<int>(std::log2(lit->value));
-            section_text << (insn->op == MUL ? "  shl " : "  shr ") << a << ", " << shift << "\n";
+            section_text << (insn->op == MUL ? "  shl " : "  shr ") << dst.val << ", " << shift << "\n";
             break;
           }
         }
       }
 
-      auto b = generateValue_x86_64(insn->ops[1]);
-      section_text << "  " << opName << ' ' << a << ", " << b << "\n";
+      std::string opName(magic_enum::enum_name(insn->op));
+      // lower op name, technically not needed, but we do it anyways for convention
+      std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+
+      ValueRepr src = generateValue_x86_64(insn->ops[1]);
+      if (dst.isPointer && src.isPointer) {
+        section_text << "  mov r11, " << src.val << "\n";
+        src.val = "r11";
+      }
+
+      section_text << "  " << opName << ' ' << dst.val << ", " << src.val << "\n";
     } break;
     default:
       break;
@@ -127,14 +140,15 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
   else if SIRF_CHECKVIRT (IrStmtLabel, lb, stat) {
     section_text << lb->label.id << ":\n";
   }
-
-  SIRF_TODO();
-  SIRF_UNREACHABLE();
+  else {
+    SIRF_TODO();
+    SIRF_UNREACHABLE();
+  }
 }
 
-std::string AsmGenerator::generateValue_x86_64(const IrValue& val) {
+ValueRepr AsmGenerator::generateValue_x86_64(const IrValue& val) {
   if SIRF_CHECKVIRT (IrValueLiteral, lit, val)
-    return std::to_string(lit->value);
+    return {std::to_string(lit->value), false};
   else if SIRF_CHECKVIRT (IrValueRegister, reg, val)
     return generateRegister_x86_64(*reg);
 

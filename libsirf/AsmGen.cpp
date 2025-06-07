@@ -28,11 +28,15 @@ int AsmGenerator::getSizeOf(const IrValue& val) {
       return size->size;
     }
   }
+  else if SIRF_CHECKVIRT (IrValueRegister, reg, val) {
+    static constexpr int WORD_SIZE = sizeof(uintptr_t);
+    return WORD_SIZE * 8;
+  }
 
   return -1;
 }
 
-std::string AsmGenerator::getSizePrefix(int size) {
+const char* AsmGenerator::getSizePrefix(int size) {
   switch (size) {
   case 8:
     return "byte";

@@ -36,6 +36,11 @@ struct StkId {
   } u;
 };
 
+struct ValueRepr {
+  std::string val;
+  bool isPointer;
+};
+
 class AsmGenerator {
 public:
   explicit AsmGenerator(const IrHolder& holder)
@@ -46,10 +51,10 @@ public:
 private:
   int getSizeOf(const IrValue& val);
 
-  std::string getSizePrefix(int size);
+  const char* getSizePrefix(int size);
 
-  std::string generateRegister_x86_64(const IrValueRegister& reg);
-  std::string generateValue_x86_64(const IrValue& val);
+  ValueRepr generateRegister_x86_64(const IrValueRegister& reg);
+  ValueRepr generateValue_x86_64(const IrValue& val);
 
   void generateStmt_x86_64(const IrStmt& stat);
 

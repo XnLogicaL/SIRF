@@ -249,8 +249,11 @@ IrStmt IrParser::parseStmt() {
 
     IrScope bodyScope = parseScope();
     return IrStmtFunction::newStmt(
-      std::move(returnType), *symbol, std::move(params),
-      /*localVars=*/{}, std::move(bodyScope)
+      std::move(returnType),
+      *symbol,
+      std::move(params),
+      /*localVars=*/{},
+      std::move(bodyScope)
     );
   }
 

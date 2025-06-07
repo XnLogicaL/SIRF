@@ -40,14 +40,14 @@
 #define SIRF_STACKTRACE ""
 #endif
 
-#define SIRF_ASSERT(condition, message)                                                                                                              \
-  if (!(condition)) {                                                                                                                                \
-    std::cerr << "XVM_ASSERT(): assertion '" << #condition << "' failed.\n"                                                                          \
-              << "location: " << __FILE__ << ":" << __LINE__ << "\nmessage: " << message << "\n";                                                    \
-    if (SIRF_HASSTACKTRACE) {                                                                                                                        \
-      std::cerr << "cstk:\n" << SIRF_STACKTRACE << '\n';                                                                                             \
-    }                                                                                                                                                \
-    std::abort();                                                                                                                                    \
+#define SIRF_ASSERT(condition, message)                                                                                     \
+  if (!(condition)) {                                                                                                       \
+    std::cerr << "assertion '" << #condition << "' failed.\n"                                                               \
+              << "  location: " << __FILE__ << ":" << __LINE__ << "\n  message: " << message << "\n";                       \
+    if (SIRF_HASSTACKTRACE) {                                                                                               \
+      std::cerr << "  stacktrace:\n" << SIRF_STACKTRACE << '\n';                                                            \
+    }                                                                                                                       \
+    std::abort();                                                                                                           \
   }
 
 #define SIRF_TODO() SIRF_ASSERT(false, "todo");
