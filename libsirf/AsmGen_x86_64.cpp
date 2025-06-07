@@ -16,14 +16,13 @@ ValueRepr AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
   if (reg.kind == QWORD) {
     static std::unordered_map<uint32_t, const char*> regMap = {
       {0, "rax"},
-      {1, "rbx"},
-      {2, "rcx"},
-      {3, "rdx"},
-      {4, "rsi"},
-      {5, "rdi"},
-      {6, "r8"},
-      {7, "r9"},
-      {8, "r10"},
+      {1, "rcx"},
+      {2, "rdx"},
+      {3, "rsi"},
+      {4, "rdi"},
+      {5, "r8"},
+      {6, "r9"},
+      {7, "r10"},
     };
 
     if (auto it = regMap.find(reg.id); it != regMap.end())
@@ -66,7 +65,6 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
   }
   else if SIRF_CHECKVIRT (IrStmtFunction, fun, stat) {
     section_text << fun->id.id << ":\n";
-    section_text << "  push rbx\n";
     section_text << "  push rbp\n";
     section_text << "  mov rbp, rsp\n";
 
@@ -86,8 +84,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     stackMap.pop_back();
 
     section_text << ".L" << fun->id.id << ".epilogue:\n";
-    section_text << "  pop rbx\n";
-    section_text << "  pop rbp\n";
+    section_text << "  leave\n";
     section_text << "  ret\n";
   }
   else if SIRF_CHECKVIRT (IrStmtInstruction, insn, stat) {

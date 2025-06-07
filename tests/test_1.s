@@ -3,7 +3,6 @@ section .text
 global main
 extern printf
 add:
-  push rbx
   push rbp
   mov rbp, rsp
   mov rax, 34
@@ -13,19 +12,15 @@ add:
   mov rax, [rbp-8]
   jmp .Ladd.epilogue
 .Ladd.epilogue:
-  pop rbx
-  pop rbp
+  leave
   ret
 main:
-  push rbx
   push rbp
   mov rbp, rsp
-  call add
   mov rax, 0
   jmp .Lmain.epilogue
 .Lmain.epilogue:
-  pop rbx
-  pop rbp
+  leave
   ret
 section .bss
 section .note.GNU-stack,"",@progbits
