@@ -15,6 +15,7 @@ enum class IrOpCode {
   MOV,
   LOAD,
   STORE,
+  ALLOCA,
   ADD,
   SUB,
   MUL,

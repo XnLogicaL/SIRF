@@ -10,13 +10,14 @@
 #include <IR/IrTypes.hpp>
 #include <IR/IrStmts.hpp>
 #include <magic_enum/magic_enum.hpp>
+#include <arena.h>
 
 #define SIRF_CHECKVIRT(type, name, target) (const type* name = dynamic_cast<const type*>(target.get()))
 
 namespace sirf {
 
 enum class StkIdKind {
-  registerSpill,
+  spill,
   variable,
 };
 
@@ -26,6 +27,7 @@ struct StkReg {
 
 struct StkVar {
   size_t offset;
+  size_t size;
 };
 
 struct StkId {
@@ -54,16 +56,15 @@ private:
   const char* getSizePrefix(int size);
 
   ValueRepr generateRegister_x86_64(const IrValueRegister& reg);
+  ValueRepr generateVariable_x86_64(const IrValueSSA& var);
   ValueRepr generateValue_x86_64(const IrValue& val);
-
   void generateStmt_x86_64(const IrStmt& stat);
 
 private:
   const IrHolder& holder;
 
   size_t spillOffset = 0;
-
-  const IrStmtFunction* currentFunction = NULL;
+  IrStmtFunction const* currentFunction = NULL;
 
   std::vector<std::unordered_map<uint32_t, StkId>> stackMap;
 

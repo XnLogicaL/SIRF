@@ -31,13 +31,23 @@ ValueRepr AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
   }
 
   auto& currentMap = stackMap.back();
-  if (auto it = currentMap.find(reg.id); it != currentMap.end() && it->second.kind == registerSpill)
+  if (auto it = currentMap.find(reg.id); it != currentMap.end() && it->second.kind == spill)
     return {std::format("[rbp-{}]", it->second.u.reg.offset), true};
 
   spillOffset += 8;
-  currentMap[reg.id] = {registerSpill, {.reg = {spillOffset}}};
-  section_text << "  sub rsp, 8                    ; r" << reg.id << " spill\n";
+  currentMap[reg.id] = {spill, {.reg = {spillOffset}}};
+  section_text << "  sub rsp, 8     ; r" << reg.id << " spill\n";
   return {std::format("[rbp-{}]", spillOffset), true};
+}
+
+ValueRepr AsmGenerator::generateVariable_x86_64(const IrValueSSA& var) {
+  auto& currentMap = stackMap.back();
+  if (auto it = currentMap.find(var.id); it != currentMap.end())
+    return {std::format("[rbp-{}]", it->second.u.var.offset), true};
+
+  // variable must be allocated via `alloca`
+  SIRF_TODO();
+  SIRF_UNREACHABLE();
 }
 
 void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
@@ -86,7 +96,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     switch (insn->op) {
     case RET: {
       if (!insn->ops.empty()) {
-        const IrValue& retv = insn->ops.at(0);
+        const IrValue& retv = insn->ops[0];
         const ValueRepr src = generateValue_x86_64(retv);
         section_text << "  mov rax, " << src.val << "\n";
       }
@@ -94,17 +104,27 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       if (currentFunction)
         section_text << "  jmp .L" << currentFunction->id.id << ".epilogue\n";
     } break;
+    case ALLOCA: {
+      const IrValue& dst = insn->ops[0];
+      const IrValue& size = insn->ops[1];
+
+      if SIRF_CHECKVIRT (IrValueSSA, ssa, dst) {
+        auto& currentMap = stackMap.back();
+
+        if SIRF_CHECKVIRT (IrValueLiteral, lit, size) {
+          const size_t size = lit->value;
+          spillOffset += size;
+          currentMap[ssa->id] = {variable, {.var = {spillOffset, size}}};
+          section_text << "  sub rsp, " << size << "     ; alloca %" << ssa->id << "\n";
+        }
+      }
+    } break;
     case ADD:
     case SUB:
     case MUL:
     case DIV:
     case MOV: {
       ValueRepr dst = generateValue_x86_64(insn->ops[0]);
-      if (dst.isPointer) {
-        const int size = getSizeOf(insn->ops[0]);
-        std::string spec = getSizePrefix(size);
-        dst.val = spec + ' ' + dst.val;
-      }
 
       // attempt mul/div strength reduction
       if (insn->op == MUL || insn->op == DIV) {
@@ -122,9 +142,15 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
 
       ValueRepr src = generateValue_x86_64(insn->ops[1]);
-      if (dst.isPointer && src.isPointer) {
-        section_text << "  mov r11, " << src.val << "\n";
-        src.val = "r11";
+      if (dst.isPointer) {
+        const int size = getSizeOf(insn->ops[0]);
+        std::string spec = getSizePrefix(size);
+        dst.val = spec + ' ' + dst.val;
+
+        if (src.isPointer) {
+          section_text << "  mov r11, " << src.val << "\n";
+          src.val = "r11";
+        }
       }
 
       section_text << "  " << opName << ' ' << dst.val << ", " << src.val << "\n";
@@ -133,8 +159,24 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       break;
     }
   }
-  else if SIRF_CHECKVIRT (IrStmtLabel, lb, stat) {
+  else if SIRF_CHECKVIRT (IrStmtLabel, lb, stat)
     section_text << lb->label.id << ":\n";
+  else if SIRF_CHECKVIRT (IrStmtAssign, as, stat) {
+    ValueRepr lval = generateValue_x86_64(as->lvalue);
+    ValueRepr rval = generateValue_x86_64(as->rvalue);
+
+    if (lval.isPointer) {
+      const int size = getSizeOf(as->lvalue);
+      std::string spec = getSizePrefix(size);
+      lval.val = spec + ' ' + lval.val;
+
+      if (rval.isPointer) {
+        section_text << "  mov r11, " << rval.val << "\n";
+        rval.val = "r11";
+      }
+    }
+
+    section_text << "  mov " << lval.val << ", " << rval.val << "\n";
   }
   else {
     SIRF_TODO();
@@ -147,6 +189,8 @@ ValueRepr AsmGenerator::generateValue_x86_64(const IrValue& val) {
     return {std::to_string(lit->value), false};
   else if SIRF_CHECKVIRT (IrValueRegister, reg, val)
     return generateRegister_x86_64(*reg);
+  else if SIRF_CHECKVIRT (IrValueSSA, ssa, val)
+    return generateVariable_x86_64(*ssa);
 
   SIRF_TODO();
   SIRF_UNREACHABLE();

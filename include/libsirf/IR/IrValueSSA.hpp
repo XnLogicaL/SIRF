@@ -11,15 +11,13 @@ namespace sirf {
 
 class IrValueSSA final : public IrValueBase {
 public:
-  const std::string id;
-  const size_t version;
+  const size_t id;
 
-  explicit IrValueSSA(std::string id, size_t version)
-    : id(id),
-      version(version) {}
+  explicit IrValueSSA(size_t id)
+    : id(id) {}
 
-  static inline IrValue newValue(std::string id, size_t version) {
-    return std::make_shared<IrValueSSA>(id, version);
+  static inline IrValue newValue(size_t id) {
+    return std::make_shared<IrValueSSA>(id);
   }
 
   /// Returns whether if the Ir value can be interpreted as an lvalue

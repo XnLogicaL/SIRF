@@ -87,9 +87,12 @@ IrValue IrParser::parseValue() {
     consume();
     Token nameTok = consume();
     if (nameTok.kind == LIT_INT)
-      return IrValueSSA::newValue("", std::stoull(nameTok.lexeme));
-    else
-      return IrValueSSA::newValue(nameTok.lexeme, 0);
+      return IrValueSSA::newValue(std::stoull(nameTok.lexeme));
+    else {
+      auto [line, off] = translateOffset(state.inputSource, nameTok.loc);
+      throw IrParserException(line, off, "SSA variables with non-integer identifiers are currently not supported");
+      // TODO ^^^^^^
+    }
   }
 
   case IDENT: {

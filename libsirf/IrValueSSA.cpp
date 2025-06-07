@@ -10,7 +10,7 @@ constexpr bool IrValueSSA::isLvalue() const {
 }
 
 std::string IrValueSSA::toString() const {
-  return '%' + id + std::to_string(version);
+  return '%' + std::to_string(id);
 }
 
 } // namespace sirf

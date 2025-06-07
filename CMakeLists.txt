@@ -15,6 +15,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(thirdparty/spdlog)
 add_subdirectory(thirdparty/argparse)
 add_subdirectory(thirdparty/magic_enum)
+add_subdirectory(thirdparty/ArenaAllocator)
 
 ### ----------------------------------------------------------------------------------
 ### libsirf stuff
@@ -31,6 +32,7 @@ add_library(sirf STATIC ${SOURCES})
 
 ### libsirf library stuff
 target_link_libraries(sirf PRIVATE magic_enum)
+target_link_libraries(sirf PRIVATE ArenaAllocator)
 
 ### libsirf include dirs
 target_include_directories(sirf PUBLIC
@@ -55,6 +57,7 @@ target_link_libraries(sirfc PRIVATE sirf)
 target_link_libraries(sirfc PRIVATE spdlog)
 target_link_libraries(sirfc PRIVATE argparse)
 target_link_libraries(sirfc PRIVATE magic_enum)
+target_link_libraries(sirfc PRIVATE ArenaAllocator)
 
 ### sirfc include dirs
 target_include_directories(sirfc PUBLIC

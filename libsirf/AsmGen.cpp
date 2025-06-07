@@ -32,6 +32,11 @@ int AsmGenerator::getSizeOf(const IrValue& val) {
     static constexpr int WORD_SIZE = sizeof(uintptr_t);
     return WORD_SIZE * 8;
   }
+  else if SIRF_CHECKVIRT (IrValueSSA, ssa, val) {
+    auto& currentMap = stackMap.back();
+    if (auto it = currentMap.find(ssa->id); it != currentMap.end() && it->second.kind == StkIdKind::variable)
+      return it->second.u.var.size * 8;
+  }
 
   return -1;
 }
