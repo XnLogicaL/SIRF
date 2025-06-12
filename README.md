@@ -45,15 +45,15 @@ fun i32 @add(%a i32, %b i32) !static {
   ret r0
 }
 
-fun i32 @main(%argc i32, %argv i8^^) {
-  %1 = 10 i32
-  %2 = 25 i32
+fun i32 @main(%argc i32, %argv ^^i8) {
+  %1 = i32 10
+  %2 = i32 25
   %3 = i32
   %4 = i32
   load %3, ptr %argv
   call @add, %4, %1, %2
   call @printf, _, ptr .LC0, %3, %4
-  ret  0 i32
+  ret  i32 0
 }
 ```
 
@@ -85,23 +85,23 @@ global @main
 data .LC0: "Sum: %d\n\0"
 
 fun i32 sum_to_n(%n i32) !static {
-  %0 = 0 i32
+  %0 = i32 0
   jmp .L1
 .L0:
   ssp
   add %0, %n
-  sub %n, 1 i32
+  sub %n, i32 1
   rsp
 .L1:
   %1 = BYTE
-  gt  %1, %n, 0 i32
+  gt  %1, %n, i32 0
   jnz %1, .L0
   ret %0
 }
 
-fun i32 main(i32, i8^^) {
+fun i32 main(i32, ^^i8) {
   %0 = i32
-  call @sum_to_n, %0, 5 i32
+  call @sum_to_n, %0, i32 5
   call @printf, _, ptr .LC0, %0
   ret  0 i32
 }
@@ -146,10 +146,10 @@ fun i32 @abs_diff(%a i32, %b i32) !static {
   ret %2
 }
 
-fun i32 @main(i32, i8^^) {
+fun i32 @main(i32, ^^i8) {
   %0 = i32
-  call @abs_diff, %0, 42 i32, 17 i32
+  call @abs_diff, %0, i32 42, i32 17
   call @printf, _, ptr .LC0, %0
-  ret 0 i32
+  ret i32 0
 }
 ```
