@@ -109,7 +109,10 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       if (!insn->ops.empty()) {
         const IrValue& retv = insn->ops[0];
         const ValueRepr src = generateValue_x86_64(retv);
-        section_text << "  mov rax, " << src.val << "\n";
+
+        // check if `src` is the return register, in which case we dont have to mov it
+        if (src.val != "rax")
+          section_text << "  mov rax, " << src.val << "\n";
       }
 
       if (currentFunction)
