@@ -1,8 +1,8 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#ifndef SIRF_ASMGENBASE_HPP
-#define SIRF_ASMGENBASE_HPP
+#ifndef SIRF_ASMGEN_HPP
+#define SIRF_ASMGEN_HPP
 
 #include <Common.hpp>
 #include "IrHolder.hpp"
@@ -10,7 +10,7 @@
 #include "IrTypes.hpp"
 #include "IrStmts.hpp"
 #include <magic_enum/magic_enum.hpp>
-#include <arena.h>
+#include <arena/arena.h>
 
 #define SIRF_CHECKVIRT(type, name, target) (const type* name = dynamic_cast<const type*>(target))
 
