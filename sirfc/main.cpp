@@ -156,7 +156,7 @@ static constexpr int _main_impl(int argc, char** argv) {
   argparse::ArgumentParser cli("sirfc");
 
   cli.add_argument("input")
-    .required()
+    .default_value("")
     .help("target source file containing SIRF IR (text format)");
   
   cli.add_argument("-o", "--output")
@@ -206,6 +206,13 @@ static constexpr int _main_impl(int argc, char** argv) {
   sirf::CState state;
   state.inputPath = cli.get("input");
   state.outputPath = cli.get("-o");
+
+  // check for empty input path
+  if (state.inputPath.empty()) {
+    spdlog::error("missing input path");
+    std::cout << cli.usage() << "\n";
+    return 1;
+  }
 
   // check for default output path
   if (state.outputPath == "a") {
