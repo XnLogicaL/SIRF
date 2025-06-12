@@ -20,6 +20,21 @@ static std::string getStackOffsetPtr(size_t offset) {
   return std::format("[rbp-{}]", offset);
 }
 
+static std::string getOpcodeName(IrOpCode op) {
+  std::string opName(magic_enum::enum_name(op));
+  std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+  return opName;
+}
+
+static bool isReturnRegister(const IrValue& val) {
+  if SIRF_CHECKVIRT (IrValueRegister, reg, val.get()) {
+    // r0/x0 corresponds to rax/eax respectively, which are the return registers in the SYSV ABI calling convention
+    return reg->id == 0;
+  }
+
+  return false;
+}
+
 size_t AsmGenerator::alloca_x86_64(size_t size) {
   // Round size up to nearest multiple of 16
   size_t aligned_size = ((size + 15) / 16) * 16;
@@ -137,7 +152,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
         const ValueRepr src = generateValue_x86_64(retv);
 
         // check if `src` is the return register, in which case we dont have to mov it
-        if (src.val != "rax")
+        if (!isReturnRegister(retv))
           section_text << "  mov rax, " << src.val << "\n";
       }
 
@@ -164,23 +179,28 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     case DIV:
     case MOV: {
       ValueRepr dst = generateValue_x86_64(insn->ops[0]);
+      ValueRepr src = generateValue_x86_64(insn->ops[1]);
 
       // attempt mul/div strength reduction
-      if (insn->op == MUL || insn->op == DIV) {
-        if SIRF_CHECKVIRT (IrValueLiteral, lit, insn->ops[1].get()) {
-          if (lit->value > 0 && (lit->value & (lit->value - 1)) == 0) {
-            int shift = static_cast<int>(std::log2(lit->value));
-            section_text << (insn->op == MUL ? "  shl " : "  shr ") << dst.val << ", " << shift << "\n";
-            break;
-          }
-        }
+      // this does not account for fractional multiplication/division, which must be handled by the front end.
+      // for instance, the following mathematical expressions can not and will not be reduced: 10*0.5, 10/0.5
+      if (insn->op != MUL && insn->op != DIV) {
+        goto no_strength_reduction;
       }
 
-      std::string opName(magic_enum::enum_name(insn->op));
-      // lower op name, technically not needed, but we do it anyways for convention
-      std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
+      if SIRF_CHECKVIRT (IrValueLiteral, lit, insn->ops[1].get()) {
+        // check whether if it is positive and is a power of 2
+        if (lit->value <= 0 || (lit->value & (lit->value - 1)) != 0) {
+          goto no_strength_reduction;
+        }
 
-      ValueRepr src = generateValue_x86_64(insn->ops[1]);
+        int shift = std::log2(lit->value);
+        section_text << (insn->op == MUL ? "  shl " : "  shr ") << dst.val << ", " << shift << "\n";
+        break;
+      }
+
+    no_strength_reduction:
+      auto opName = getOpcodeName(insn->op);
       generateBinaryInstruction_x86_64(opName, dst, src);
     } break;
     default:
