@@ -22,9 +22,9 @@ static constexpr LinkerId getLinkerId() {
   return LNONE;
 }
 
-int AsmGenerator::getSizeOf(const IrValue& val) {
+int AsmGenerator::getSizeOf(const IrValueBase* val) {
   if SIRF_CHECKVIRT (IrValueLiteral, lit, val) {
-    if SIRF_CHECKVIRT (IrTypeSized, size, lit->type) {
+    if SIRF_CHECKVIRT (IrTypeSized, size, lit->type.get()) {
       return size->size;
     }
   }

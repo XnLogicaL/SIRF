@@ -12,7 +12,7 @@
 #include <magic_enum/magic_enum.hpp>
 #include <arena.h>
 
-#define SIRF_CHECKVIRT(type, name, target) (const type* name = dynamic_cast<const type*>(target.get()))
+#define SIRF_CHECKVIRT(type, name, target) (const type* name = dynamic_cast<const type*>(target))
 
 namespace sirf {
 
@@ -39,8 +39,9 @@ struct StkId {
 };
 
 struct ValueRepr {
-  std::string val;
-  bool isPointer;
+  const bool isPointer;
+  const std::string val;
+  const IrValueBase* og_val;
 };
 
 class AsmGenerator {
@@ -51,12 +52,14 @@ public:
   std::string generate();
 
 private:
-  int getSizeOf(const IrValue& val);
+  int getSizeOf(const IrValueBase* val);
 
   const char* getSizePrefix(int size);
 
   // x86-64 stuff
   size_t alloca_x86_64(size_t size);
+
+  void generateBinaryInstruction_x86_64(const std::string& opName, const ValueRepr& dst, const ValueRepr& src);
 
   ValueRepr generateRegister_x86_64(const IrValueRegister& reg);
   ValueRepr generateVariable_x86_64(const IrValueSSA& var);

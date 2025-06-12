@@ -12,6 +12,14 @@ namespace sirf {
 using enum StkIdKind;
 using enum IrRegisterKind;
 
+static std::string getEpilogueLabelName(const std::string& func_name) {
+  return std::format(".L{}.epilogue", func_name);
+}
+
+static std::string getStackOffsetPtr(size_t offset) {
+  return std::format("[rbp-{}]", offset);
+}
+
 size_t AsmGenerator::alloca_x86_64(size_t size) {
   // Round size up to nearest multiple of 16
   size_t aligned_size = ((size + 15) / 16) * 16;
@@ -24,6 +32,24 @@ size_t AsmGenerator::alloca_x86_64(size_t size) {
 
   allocaRemBytes -= size;
   return stackOffset - allocaRemBytes - size;
+}
+
+void AsmGenerator::generateBinaryInstruction_x86_64(const std::string& opName, const ValueRepr& dst, const ValueRepr& src) {
+  std::string dst_val = dst.val, src_val = src.val;
+
+  if (dst.isPointer) {
+    if (src.isPointer) {
+      section_text << "  mov r11, " << src.val << "\n";
+      dst_val = "r11";
+    }
+    else {
+      const int size = getSizeOf(dst.og_val);
+      const std::string pref = getSizePrefix(size);
+      dst_val = pref + ' ' + dst.val;
+    }
+  }
+
+  section_text << "  " << opName << ' ' << dst_val << ", " << src_val << "\n";
 }
 
 ValueRepr AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
@@ -40,23 +66,23 @@ ValueRepr AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
     };
 
     if (auto it = regMap.find(reg.id); it != regMap.end())
-      return {it->second, false};
+      return {false, it->second, &reg};
   }
 
   auto& currentMap = stackMap.back();
   if (auto it = currentMap.find(reg.id); it != currentMap.end() && it->second.kind == spill)
-    return {std::format("[rbp-{}]", it->second.u.reg.offset), true};
+    return {true, getStackOffsetPtr(it->second.u.reg.offset), &reg};
 
   stackOffset += 8;
   currentMap[reg.id] = {spill, {.reg = {stackOffset}}};
-  section_text << "  sub rsp, 8     ; r" << reg.id << " spill\n";
-  return {std::format("[rbp-{}]", stackOffset), true};
+  section_text << "  sub rsp, 8\n";
+  return {true, getStackOffsetPtr(stackOffset), &reg};
 }
 
 ValueRepr AsmGenerator::generateVariable_x86_64(const IrValueSSA& var) {
   auto& currentMap = stackMap.back();
   if (auto it = currentMap.find(var.id); it != currentMap.end())
-    return {std::format("[rbp-{}]", it->second.u.var.offset), true};
+    return {true, getStackOffsetPtr(it->second.u.var.offset), &var};
 
   // variable must be allocated via `alloca`
   SIRF_TODO();
@@ -64,8 +90,8 @@ ValueRepr AsmGenerator::generateVariable_x86_64(const IrValueSSA& var) {
 }
 
 void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
-  if SIRF_CHECKVIRT (IrStmtDeclaration, decl, stat) {
-    if SIRF_CHECKVIRT (IrValueSymbol, sym, decl->value) {
+  if SIRF_CHECKVIRT (IrStmtDeclaration, decl, stat.get()) {
+    if SIRF_CHECKVIRT (IrValueSymbol, sym, decl->value.get()) {
       switch (decl->kind) {
       case IrDeclKind::EXTERN:
         section_text << "extern " << sym->id << "\n";
@@ -77,7 +103,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       }
     }
   }
-  else if SIRF_CHECKVIRT (IrStmtFunction, fun, stat) {
+  else if SIRF_CHECKVIRT (IrStmtFunction, fun, stat.get()) {
     section_text << fun->id.id << ":\n";
     section_text << "  push rbp\n";
     section_text << "  mov rbp, rsp\n";
@@ -97,11 +123,11 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     currentFunction = oldFun;
     stackMap.pop_back();
 
-    section_text << ".L" << fun->id.id << ".epilogue:\n";
+    section_text << getEpilogueLabelName(fun->id.id) << ":\n";
     section_text << "  leave\n";
     section_text << "  ret\n";
   }
-  else if SIRF_CHECKVIRT (IrStmtInstruction, insn, stat) {
+  else if SIRF_CHECKVIRT (IrStmtInstruction, insn, stat.get()) {
     using enum IrOpCode;
 
     switch (insn->op) {
@@ -116,16 +142,16 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       }
 
       if (currentFunction)
-        section_text << "  jmp .L" << currentFunction->id.id << ".epilogue\n";
+        section_text << "  jmp " << getEpilogueLabelName(currentFunction->id.id) << "\n";
     } break;
     case ALLOCA: {
       const IrValue& dst = insn->ops[0];
       const IrValue& size = insn->ops[1];
 
-      if SIRF_CHECKVIRT (IrValueSSA, ssa, dst) {
+      if SIRF_CHECKVIRT (IrValueSSA, ssa, dst.get()) {
         auto& currentMap = stackMap.back();
 
-        if SIRF_CHECKVIRT (IrValueLiteral, lit, size) {
+        if SIRF_CHECKVIRT (IrValueLiteral, lit, size.get()) {
           const size_t size = lit->value;
           const size_t offset = alloca_x86_64(size);
           currentMap[ssa->id] = {variable, {.var = {offset, size}}};
@@ -141,7 +167,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
 
       // attempt mul/div strength reduction
       if (insn->op == MUL || insn->op == DIV) {
-        if SIRF_CHECKVIRT (IrValueLiteral, lit, insn->ops[1]) {
+        if SIRF_CHECKVIRT (IrValueLiteral, lit, insn->ops[1].get()) {
           if (lit->value > 0 && (lit->value & (lit->value - 1)) == 0) {
             int shift = static_cast<int>(std::log2(lit->value));
             section_text << (insn->op == MUL ? "  shl " : "  shr ") << dst.val << ", " << shift << "\n";
@@ -155,41 +181,18 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       std::transform(opName.begin(), opName.end(), opName.begin(), ::tolower);
 
       ValueRepr src = generateValue_x86_64(insn->ops[1]);
-      if (dst.isPointer) {
-        const int size = getSizeOf(insn->ops[0]);
-        std::string spec = getSizePrefix(size);
-        dst.val = spec + ' ' + dst.val;
-
-        if (src.isPointer) {
-          section_text << "  mov r11, " << src.val << "\n";
-          src.val = "r11";
-        }
-      }
-
-      section_text << "  " << opName << ' ' << dst.val << ", " << src.val << "\n";
+      generateBinaryInstruction_x86_64(opName, dst, src);
     } break;
     default:
       break;
     }
   }
-  else if SIRF_CHECKVIRT (IrStmtLabel, lb, stat)
+  else if SIRF_CHECKVIRT (IrStmtLabel, lb, stat.get())
     section_text << lb->label.id << ":\n";
-  else if SIRF_CHECKVIRT (IrStmtAssign, as, stat) {
+  else if SIRF_CHECKVIRT (IrStmtAssign, as, stat.get()) {
     ValueRepr lval = generateValue_x86_64(as->lvalue);
     ValueRepr rval = generateValue_x86_64(as->rvalue);
-
-    if (lval.isPointer) {
-      const int size = getSizeOf(as->lvalue);
-      std::string spec = getSizePrefix(size);
-      lval.val = spec + ' ' + lval.val;
-
-      if (rval.isPointer) {
-        section_text << "  mov r11, " << rval.val << "\n";
-        rval.val = "r11";
-      }
-    }
-
-    section_text << "  mov " << lval.val << ", " << rval.val << "\n";
+    generateBinaryInstruction_x86_64("mov", lval, rval);
   }
   else {
     SIRF_TODO();
@@ -198,11 +201,11 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
 }
 
 ValueRepr AsmGenerator::generateValue_x86_64(const IrValue& val) {
-  if SIRF_CHECKVIRT (IrValueLiteral, lit, val)
-    return {std::to_string(lit->value), false};
-  else if SIRF_CHECKVIRT (IrValueRegister, reg, val)
+  if SIRF_CHECKVIRT (IrValueLiteral, lit, val.get())
+    return {false, std::to_string(lit->value), val.get()};
+  else if SIRF_CHECKVIRT (IrValueRegister, reg, val.get())
     return generateRegister_x86_64(*reg);
-  else if SIRF_CHECKVIRT (IrValueSSA, ssa, val)
+  else if SIRF_CHECKVIRT (IrValueSSA, ssa, val.get())
     return generateVariable_x86_64(*ssa);
 
   SIRF_TODO();
