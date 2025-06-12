@@ -37,23 +37,19 @@ SIRF IR equivalent:
 extern @printf
 global @main
 
-data .LC0: "%s: %d\n\0"
+data .LC0: "%s: %d", 0x0a, 0x00
 
 fun i32 @add(%a i32, %b i32) !static {
-  mov r0, %a
-  add r0, %b
-  ret r0
+  ret add %a, %b
 }
 
 fun i32 @main(%argc i32, %argv ^^i8) {
   %0 = i32 10
   %1 = i32 25
-  alloca  %2, 4
-  alloca  %3, 4
-  load    %2, %argv
-  call    @add, %3, %0, %1
-  call    @printf, _, .LC0, %2, %3
-  ret     i32 0
+  %2 = load %argv
+  %3 = call @add(%0, %1)
+  call @printf(.LC0, %2, %3)
+  ret  i32 0
 }
 ```
 
@@ -82,28 +78,26 @@ SIRF IR equivalent:
 extern @printf
 global @main
 
-data .LC0: "Sum: %d\n\0"
+data .LC0: "Sum: %d", 0x0a, 0x00
 
 fun i32 sum_to_n(%n i32) !static {
-  alloca %0, 4
   %0 = i32 0
   jmp .L1
-.L0: {
-    add %0, %n
-    sub %n, i32 1
-  }
+.L0:
+  do
+  add %0, %n
+  sub %n, i32 1
+  end
 .L1:
-  alloca  %1 1
-  gt      %1, %n, i32 0
-  jnz     %1, .L0
-  ret     %0
+  %1 = gt %n, i32 0
+  jnz %1, .L0
+  ret %0
 }
 
 fun i32 main(%argc i32, %argv ^^i8) {
-  alloca  %0, 4
-  call    @sum_to_n, %0, i32 5
-  call    @printf, _, ptr .LC0, %0
-  ret     0 i32
+  %0 = call @sum_to_n(i32 5)
+  call @printf(.LC0, %0)
+  ret 0 i32
 }
 ```
 
@@ -130,26 +124,20 @@ SIRF IR equivalent:
 extern @printf
 global @main
 
-data .LC0: "Absolute Difference: %d\n\0"
+data .LC0: "Absolute Difference: %d", 0x0a, 0x00
 
 fun i32 @abs_diff(%a i32, %b i32) !static {
-  alloca  %0, 1
-  gt      %0, %a, %b
-  jnz     %0, .L1
+  %0 = gt %a, %b
+  jnz %0, .L1
 .L0:
-  alloca  %1, 4
-  sub     %1, %b, %a
-  ret     %1
+  ret sub %b, %a
 .L1:
-  alloca  %2, 4
-  sub     %2, %a, %b
-  ret     %2
+  ret sub %a, %b
 }
 
 fun i32 @main(%argc i32, %argv ^^i8) {
-  alloca  %0, 4
-  call    @abs_diff, %0, i32 42, i32 17
-  call    @printf, _, ptr .LC0, %0
-  ret     i32 0
+  %0 = call @abs_diff(i32 42, i32 17)
+  call @printf(.LC0, %0)
+  ret  i32 0
 }
 ```
