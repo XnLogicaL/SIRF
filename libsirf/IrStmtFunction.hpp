@@ -4,13 +4,13 @@
 #ifndef SIRF_IRSTMTFUNCTION_HPP
 #define SIRF_IRSTMTFUNCTION_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrValueSSA.hpp>
-#include <IR/IrValueSymbol.hpp>
-#include <IR/IrAttribute.hpp>
-#include <IR/IrTypeBase.hpp>
-#include <IR/IrStmtBase.hpp>
-#include <IR/IrValueBase.hpp>
+#include "Common.hpp"
+#include "IrValueSSA.hpp"
+#include "IrValueSymbol.hpp"
+#include "IrAttribute.hpp"
+#include "IrTypeBase.hpp"
+#include "IrStmtBase.hpp"
+#include "IrValueBase.hpp"
 
 namespace sirf {
 
@@ -31,15 +31,21 @@ public:
   const std::vector<IrAttribute> attribs;
   const IrScope body;
 
-  explicit IrStmtFunction(IrType ret, IrValueSymbol id, std::vector<IrParameter> pars, std::vector<IrAttribute> atts, IrScope body)
+  explicit IrStmtFunction(
+    IrType ret, IrValueSymbol id, std::vector<IrParameter> pars, std::vector<IrAttribute> atts, IrScope body
+  )
     : retType(ret),
       id(id),
       params(pars),
       attribs(atts),
       body(body) {}
 
-  inline static IrStmt newStmt(IrType ret, IrValueSymbol id, std::vector<IrParameter> pars, std::vector<IrAttribute> atts, IrScope body) {
-    return std::make_shared<IrStmtFunction>(std::move(ret), std::move(id), std::move(pars), std::move(atts), std::move(body));
+  inline static IrStmt newStmt(
+    IrType ret, IrValueSymbol id, std::vector<IrParameter> pars, std::vector<IrAttribute> atts, IrScope body
+  ) {
+    return std::make_shared<IrStmtFunction>(
+      std::move(ret), std::move(id), std::move(pars), std::move(atts), std::move(body)
+    );
   }
 
   std::string toString() const override;

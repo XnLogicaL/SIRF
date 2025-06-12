@@ -4,7 +4,7 @@
 #ifndef SIRFC_IRLEXER_HPP
 #define SIRFC_IRLEXER_HPP
 
-#include <Core/Common.hpp>
+#include "Common.hpp"
 #include "CState.hpp"
 
 namespace sirf {

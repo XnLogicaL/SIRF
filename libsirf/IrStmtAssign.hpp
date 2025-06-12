@@ -4,10 +4,10 @@
 #ifndef SIRF_IRSTMTASSIGN_HPP
 #define SIRF_IRSTMTASSIGN_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrValueBase.hpp>
-#include <IR/IrValueSSA.hpp>
-#include <IR/IrStmtBase.hpp>
+#include "Common.hpp"
+#include "IrValueBase.hpp"
+#include "IrValueSSA.hpp"
+#include "IrStmtBase.hpp"
 
 namespace sirf {
 

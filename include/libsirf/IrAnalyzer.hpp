@@ -4,11 +4,11 @@
 #ifndef SIRF_IRANALYZER_HPP
 #define SIRF_IRANALYZER_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrValues.hpp>
-#include <IR/IrTypes.hpp>
-#include <IR/IrStmts.hpp>
-#include <IR/IrHolder.hpp>
+#include "Common.hpp"
+#include "IrValues.hpp"
+#include "IrTypes.hpp"
+#include "IrStmts.hpp"
+#include "IrHolder.hpp"
 
 namespace sirf {
 

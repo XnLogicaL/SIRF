@@ -5,10 +5,10 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <Asm/AsmGen.hpp>
-#include <IR/IrValueLiteral.hpp>
-#include <IR/IrTypeSized.hpp>
-#include <IR/IrTypePtr.hpp>
+#include <AsmGen.hpp>
+#include "IrValueLiteral.hpp"
+#include "IrTypeSized.hpp"
+#include "IrTypePtr.hpp"
 #include "CState.hpp"
 #include "IrLexer.hpp"
 #include "IrParser.hpp"
@@ -121,15 +121,16 @@ static constexpr int emitTtree(sirf::CState& state) {
   }
 
   const auto emitTokenJSON = [&](const sirf::Token& tok, bool is_last) {
-    ofs << "  { \"kind\": \"" << magic_enum::enum_name(tok.kind) << "\", \"lexeme\": \"" << tok.lexeme << "\", \"pos\": " << tok.loc << " }";
+    ofs << "  { \"kind\": \"" << magic_enum::enum_name(tok.kind) << "\", \"lexeme\": \"" << tok.lexeme
+        << "\", \"pos\": " << tok.loc << " }";
     if (!is_last)
       ofs << ",";
     ofs << "\n";
   };
 
   const auto emitTokenTup = [&](const sirf::Token& tok) {
-    ofs << '(' << std::setw(12) << std::left << magic_enum::enum_name(tok.kind) << ", '" << tok.lexeme << "', " << std::setw(3) << std::setfill('0')
-        << tok.loc << ")\n";
+    ofs << '(' << std::setw(12) << std::left << magic_enum::enum_name(tok.kind) << ", '" << tok.lexeme << "', "
+        << std::setw(3) << std::setfill('0') << tok.loc << ")\n";
   };
 
   const std::size_t count = state.tokHolder.size();

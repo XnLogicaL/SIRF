@@ -38,6 +38,7 @@ target_link_libraries(sirf PRIVATE ArenaAllocator)
 target_include_directories(sirf PUBLIC
   include
   include/libsirf
+  libsirf
 )
 
 ### ----------------------------------------------------------------------------------

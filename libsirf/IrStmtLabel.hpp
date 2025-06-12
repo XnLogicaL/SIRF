@@ -4,9 +4,9 @@
 #ifndef SIRF_IRSTMTLABEL_HPP
 #define SIRF_IRSTMTLABEL_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrValueLabel.hpp>
-#include <IR/IrStmtBase.hpp>
+#include "Common.hpp"
+#include "IrValueLabel.hpp"
+#include "IrStmtBase.hpp"
 
 namespace sirf {
 

@@ -6,9 +6,9 @@
 
 #include <magic_enum/magic_enum.hpp>
 #include <spdlog/spdlog.h>
-#include <IR/IrValues.hpp>
-#include <IR/IrTypes.hpp>
-#include <IR/IrStmts.hpp>
+#include "IrValues.hpp"
+#include "IrTypes.hpp"
+#include "IrStmts.hpp"
 #include "IrLexer.hpp"
 #include "CState.hpp"
 

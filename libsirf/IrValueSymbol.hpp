@@ -1,23 +1,23 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#ifndef SIRF_IRVALUESSA_HPP
-#define SIRF_IRVALUESSA_HPP
+#ifndef SIRF_IRVALUESYMBOL_HPP
+#define SIRF_IRVALUESYMBOL_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrValueBase.hpp>
+#include "Common.hpp"
+#include "IrValueBase.hpp"
 
 namespace sirf {
 
-class IrValueSSA final : public IrValueBase {
+class IrValueSymbol final : public IrValueBase {
 public:
-  const size_t id;
+  const std::string id;
 
-  explicit IrValueSSA(size_t id)
+  explicit IrValueSymbol(std::string id)
     : id(id) {}
 
-  static inline IrValue newValue(size_t id) {
-    return std::make_shared<IrValueSSA>(id);
+  static inline IrValue newValue(std::string id) {
+    return std::make_shared<IrValueSymbol>(id);
   }
 
   /// Returns whether if the Ir value can be interpreted as an lvalue

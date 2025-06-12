@@ -4,7 +4,7 @@
 #ifndef SIRF_IRSTMTBASE_HPP
 #define SIRF_IRSTMTBASE_HPP
 
-#include <Core/Common.hpp>
+#include "Common.hpp"
 
 namespace sirf {
 

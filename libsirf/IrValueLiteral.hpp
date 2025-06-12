@@ -4,9 +4,9 @@
 #ifndef SIRF_IRVALUELITERAL_HPP
 #define SIRF_IRVALUELITERAL_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrTypeBase.hpp>
-#include <IR/IrValueBase.hpp>
+#include "Common.hpp"
+#include "IrTypeBase.hpp"
+#include "IrValueBase.hpp"
 
 namespace sirf {
 

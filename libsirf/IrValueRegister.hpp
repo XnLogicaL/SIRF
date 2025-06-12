@@ -4,8 +4,8 @@
 #ifndef SIRF_IRVALUEREGISTER_HPP
 #define SIRF_IRVALUEREGISTER_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrValueBase.hpp>
+#include "Common.hpp"
+#include "IrValueBase.hpp"
 
 namespace sirf {
 

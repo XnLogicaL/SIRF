@@ -4,8 +4,8 @@
 #ifndef SIRF_IRTYPEPTR_HPP
 #define SIRF_IRTYPEPTR_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrTypeBase.hpp>
+#include "Common.hpp"
+#include "IrTypeBase.hpp"
 
 namespace sirf {
 

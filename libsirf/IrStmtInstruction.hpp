@@ -4,9 +4,9 @@
 #ifndef SIRF_IRSTMTINSTRUCTION_HPP
 #define SIRF_IRSTMTINSTRUCTION_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrValueBase.hpp>
-#include <IR/IrStmtBase.hpp>
+#include "Common.hpp"
+#include "IrValueBase.hpp"
+#include "IrStmtBase.hpp"
 
 namespace sirf {
 

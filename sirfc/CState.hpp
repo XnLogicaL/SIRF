@@ -4,8 +4,8 @@
 #ifndef SIRFC_CSTATE_HPP
 #define SIRFC_CSTATE_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrHolder.hpp>
+#include "Common.hpp"
+#include "IrHolder.hpp"
 
 namespace sirf {
 

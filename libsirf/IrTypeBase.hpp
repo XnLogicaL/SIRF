@@ -1,18 +1,19 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#ifndef SIRF_IRHOLDER_HPP
-#define SIRF_IRHOLDER_HPP
+#ifndef SIRF_IRTYPEBASE_HPP
+#define SIRF_IRTYPEBASE_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrStmtBase.hpp>
+#include "Common.hpp"
 
 namespace sirf {
 
-class IrHolder final {
+class IrTypeBase {
 public:
-  std::vector<IrStmt> data;
+  virtual std::string toString() const = 0;
 };
+
+using IrType = std::shared_ptr<IrTypeBase>;
 
 } // namespace sirf
 

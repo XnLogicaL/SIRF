@@ -4,7 +4,7 @@
 #ifndef SIRF_IRVALUEBASE_HPP
 #define SIRF_IRVALUEBASE_HPP
 
-#include <Core/Common.hpp>
+#include "Common.hpp"
 
 namespace sirf {
 

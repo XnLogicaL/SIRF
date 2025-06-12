@@ -4,8 +4,8 @@
 #ifndef SIRF_IRATTRIBUTE_HPP
 #define SIRF_IRATTRIBUTE_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrValueBase.hpp>
+#include "Common.hpp"
+#include "IrValueBase.hpp"
 
 namespace sirf {
 

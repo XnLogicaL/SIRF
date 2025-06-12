@@ -4,11 +4,11 @@
 #ifndef SIRF_ASMGENBASE_HPP
 #define SIRF_ASMGENBASE_HPP
 
-#include <Core/Common.hpp>
-#include <IR/IrHolder.hpp>
-#include <IR/IrValues.hpp>
-#include <IR/IrTypes.hpp>
-#include <IR/IrStmts.hpp>
+#include <Common.hpp>
+#include "IrHolder.hpp"
+#include "IrValues.hpp"
+#include "IrTypes.hpp"
+#include "IrStmts.hpp"
 #include <magic_enum/magic_enum.hpp>
 #include <arena.h>
 

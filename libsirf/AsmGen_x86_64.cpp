@@ -1,9 +1,9 @@
 // This file is a part of the SIRF (Simple Intermediate Representation Format)
 // project Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
-#include <Asm/AsmGen.hpp>
-#include <IR/IrValueLiteral.hpp>
-#include <IR/IrTypeSized.hpp>
+#include <AsmGen.hpp>
+#include "IrValueLiteral.hpp"
+#include "IrTypeSized.hpp"
 #include <cassert>
 #include <cmath>
 
