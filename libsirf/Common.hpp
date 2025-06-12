@@ -20,7 +20,6 @@
 #include <unordered_map>
 #include <exception>
 
-#include "APIConfig.hpp"
-#include "APIMacros.hpp"
+#include "Config.hpp"
 
 #endif

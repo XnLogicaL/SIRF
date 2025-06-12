@@ -100,7 +100,6 @@ ValueRepr AsmGenerator::generateVariable_x86_64(const IrValueSSA& var) {
     return {true, getStackOffsetPtr(it->second.u.var.offset), &var};
 
   // variable must be allocated via `alloca`
-  SIRF_TODO();
   SIRF_UNREACHABLE();
 }
 
@@ -214,10 +213,8 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     ValueRepr rval = generateValue_x86_64(as->rvalue);
     generateBinaryInstruction_x86_64("mov", lval, rval);
   }
-  else {
-    SIRF_TODO();
+  else
     SIRF_UNREACHABLE();
-  }
 }
 
 ValueRepr AsmGenerator::generateValue_x86_64(const IrValue& val) {
@@ -228,7 +225,6 @@ ValueRepr AsmGenerator::generateValue_x86_64(const IrValue& val) {
   else if SIRF_CHECKVIRT (IrValueSSA, ssa, val.get())
     return generateVariable_x86_64(*ssa);
 
-  SIRF_TODO();
   SIRF_UNREACHABLE();
 }
 
