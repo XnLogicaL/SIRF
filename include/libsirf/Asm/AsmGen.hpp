@@ -55,16 +55,21 @@ private:
 
   const char* getSizePrefix(int size);
 
+  // x86-64 stuff
+  size_t alloca_x86_64(size_t size);
+
   ValueRepr generateRegister_x86_64(const IrValueRegister& reg);
   ValueRepr generateVariable_x86_64(const IrValueSSA& var);
   ValueRepr generateValue_x86_64(const IrValue& val);
+
   void generateStmt_x86_64(const IrStmt& stat);
 
 private:
   const IrHolder& holder;
 
-  size_t spillOffset = 0;
-  IrStmtFunction const* currentFunction = NULL;
+  size_t stackOffset = 0;
+  size_t allocaRemBytes = 0;
+  const IrStmtFunction* currentFunction = NULL;
 
   std::vector<std::unordered_map<uint32_t, StkId>> stackMap;
 

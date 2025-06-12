@@ -12,6 +12,20 @@ namespace sirf {
 using enum StkIdKind;
 using enum IrRegisterKind;
 
+size_t AsmGenerator::alloca_x86_64(size_t size) {
+  // Round size up to nearest multiple of 16
+  size_t aligned_size = ((size + 15) / 16) * 16;
+
+  if (allocaRemBytes < size) {
+    stackOffset += aligned_size;
+    allocaRemBytes = aligned_size;
+    section_text << "  sub rsp, " << aligned_size << "\n";
+  }
+
+  allocaRemBytes -= size;
+  return stackOffset - allocaRemBytes - size;
+}
+
 ValueRepr AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
   if (reg.kind == QWORD) {
     static std::unordered_map<uint32_t, const char*> regMap = {
@@ -33,10 +47,10 @@ ValueRepr AsmGenerator::generateRegister_x86_64(const IrValueRegister& reg) {
   if (auto it = currentMap.find(reg.id); it != currentMap.end() && it->second.kind == spill)
     return {std::format("[rbp-{}]", it->second.u.reg.offset), true};
 
-  spillOffset += 8;
-  currentMap[reg.id] = {spill, {.reg = {spillOffset}}};
+  stackOffset += 8;
+  currentMap[reg.id] = {spill, {.reg = {stackOffset}}};
   section_text << "  sub rsp, 8     ; r" << reg.id << " spill\n";
-  return {std::format("[rbp-{}]", spillOffset), true};
+  return {std::format("[rbp-{}]", stackOffset), true};
 }
 
 ValueRepr AsmGenerator::generateVariable_x86_64(const IrValueSSA& var) {
@@ -68,10 +82,10 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     section_text << "  push rbp\n";
     section_text << "  mov rbp, rsp\n";
 
-    const size_t oldSpillOffset = spillOffset;
+    const size_t oldstackOffset = stackOffset;
     const IrStmtFunction* oldFun = currentFunction;
 
-    spillOffset = 0;
+    stackOffset = 0;
     currentFunction = fun;
     stackMap.push_back({});
 
@@ -79,7 +93,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       generateStmt_x86_64(bodyStat);
     }
 
-    spillOffset = oldSpillOffset;
+    stackOffset = oldstackOffset;
     currentFunction = oldFun;
     stackMap.pop_back();
 
@@ -110,9 +124,8 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
 
         if SIRF_CHECKVIRT (IrValueLiteral, lit, size) {
           const size_t size = lit->value;
-          spillOffset += size;
-          currentMap[ssa->id] = {variable, {.var = {spillOffset, size}}};
-          section_text << "  sub rsp, " << size << "     ; alloca %" << ssa->id << "\n";
+          const size_t offset = alloca_x86_64(size);
+          currentMap[ssa->id] = {variable, {.var = {offset, size}}};
         }
       }
     } break;
