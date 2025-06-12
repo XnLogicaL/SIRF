@@ -1,0 +1,17 @@
+global @main
+extern @printf
+
+data .fmt: "%d", 0x0a, 0x00
+
+fun i32 @add(%0 i32, %1 i32) {
+  mov r0, %0
+  add r0, %1
+  ret r0
+}
+
+fun i32 @main(%0 i32, %1 ^^i8) {
+  alloca %2, 4
+  call @add, %2, i32 34, i32 35
+  call @printf, _, .fmt, %2
+  ret i32 0
+}

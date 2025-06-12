@@ -1,0 +1,10 @@
+global @main
+extern @printf
+
+data .fmt: "Hello world, from %s!", 0x0a, 0x00
+data .msg: "SIRF", 0x00
+
+fun i32 @main(%0 i32, %1 ^^i8) {
+    call @printf, _, .fmt, .msg
+    ret i32 0
+}
