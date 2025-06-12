@@ -5,7 +5,7 @@ import subprocess
 import os
 from loguru import logger
 
-TESTS_DIR="./tests"
+TESTS_DIR="./tests/auto"
 BINARY="./build/sirfc"
 
 def run_test(test_file):
