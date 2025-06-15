@@ -79,8 +79,8 @@ Token IrLexer::readIdent() {
   auto is_allowed = [&](char chr) -> bool {
     bool is_alnum = std::isalnum(static_cast<unsigned char>(chr));
     bool is_special =
-      (std::ranges::find(allowed_identifier_spec_chars.begin(), allowed_identifier_spec_chars.end(), chr) !=
-       allowed_identifier_spec_chars.end());
+      (std::ranges::find(allowed_identifier_spec_chars.begin(), allowed_identifier_spec_chars.end(), chr)
+       != allowed_identifier_spec_chars.end());
     return is_alnum || is_special;
   };
 
@@ -92,6 +92,7 @@ Token IrLexer::readIdent() {
   static const std::unordered_map<std::string, TokenKind> kwMap = {
     {"global", KW_GLOBAL},
     {"extern", KW_EXTERN},
+    {"data", KW_DATA},
     {"fun", KW_FUN},
   };
 

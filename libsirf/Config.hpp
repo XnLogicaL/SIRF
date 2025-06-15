@@ -4,6 +4,8 @@
 #ifndef SIRF_APICONFIG_HPP
 #define SIRF_APICONFIG_HPP
 
+#include <cassert>
+
 #define SIRF_UNREACHABLE()                                                                                                  \
   do {                                                                                                                      \
     assert(false && "unreachable point reached");                                                                           \

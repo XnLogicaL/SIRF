@@ -183,6 +183,11 @@ IrType IrParser::parseType() {
       catch (...) {
         throwUnexpectedToken(state.inputSource, token.loc, "invalid sized type '{}'", lex);
       }
+
+      // it should be quite obvious why we have to check this.
+      if (bitWidth % 8 != 0)
+        throwUnexpectedToken(state.inputSource, token.loc, "sized types must be 8-bit aligned");
+
       return IrTypeSized::newType(isSigned, bitWidth);
     }
     break;
@@ -211,12 +216,10 @@ IrStmt IrParser::parseStmt() {
   case KW_EXTERN:
     consume();
     return IrStmtDeclaration::newStmt(IrDeclKind::EXTERN, parseValue());
-  case PERCENT: {
-    IrValue lval = parseValue();
-    assertConsume(EQUALS);
-    IrValue rval = parseValue();
-    return IrStmtAssign::newStmt(lval, rval);
+
+  case KW_DATA: {
   }
+
   case KW_FUN: {
     consume();
 
@@ -244,9 +247,8 @@ IrStmt IrParser::parseStmt() {
       IrType paramType = parseType();
       params.emplace_back(std::move(*ssaName), std::move(paramType));
 
-      if (peek(0).kind == COMMA) {
+      if (peek(0).kind == COMMA)
         consume(); // skip comma
-      }
     }
     assertConsume(PAREN_CLOSE);
 
@@ -260,6 +262,13 @@ IrStmt IrParser::parseStmt() {
     );
   }
 
+  case PERCENT: {
+    IrValue lval = parseValue();
+    assertConsume(EQUALS);
+    IrValue rval = parseValue();
+    return IrStmtAssign::newStmt(lval, rval);
+  }
+
   case IDENT: {
     consume();
 
@@ -269,8 +278,7 @@ IrStmt IrParser::parseStmt() {
 
     auto maybeOp = magic_enum::enum_cast<IrOpCode>(opcodeLex);
     if (!maybeOp.has_value())
-      throwUnexpectedToken(state.inputSource, token.loc, "unrecognized opcode '{}'", token.lexeme);
-    IrOpCode op = *maybeOp;
+      throwUnexpectedToken(state.inputSource, token.loc, "unknown directive '{}'", token.lexeme);
 
     std::vector<IrValue> operands;
     do {
@@ -281,21 +289,20 @@ IrStmt IrParser::parseStmt() {
         break;
     } while (true);
 
-    return IrStmtInstruction::newStmt(op, std::move(operands));
+    return IrStmtInstruction::newStmt(*maybeOp, std::move(operands));
   }
 
-  default: {
+  default:
     throwUnexpectedToken(state.inputSource, token.loc, "unexpected token '{}' while parsing statement", token.lexeme);
-  }
   }
 }
 
 void IrParser::parse() {
   try {
     while (true) {
-      if (peek(0).kind == EOF_) {
+      if (peek(0).kind == EOF_)
         break;
-      }
+
       state.irHolder.data.push_back(parseStmt());
     }
   }

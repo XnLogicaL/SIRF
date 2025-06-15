@@ -32,6 +32,7 @@ enum class TokenKind {
   LIT_STR,
 
   KW_FUN,
+  KW_DATA,
   KW_GLOBAL,
   KW_EXTERN,
 };
