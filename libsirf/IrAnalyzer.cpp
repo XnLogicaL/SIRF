@@ -16,11 +16,11 @@ static bool isInstanceOf(const Base* base) {
 
 static const IrStmtDeclaration* getFuncDecl(const IrHolder& holder, const IrValueSymbol& symbol) {
   for (const IrStmt& stmt : holder.data) {
-    const IrStmtDeclaration* stmtDecl = dynamic_cast<const IrStmtDeclaration*>(stmt.get());
+    const IrStmtDeclaration* stmtDecl = dynamic_cast<const IrStmtDeclaration*>(stmt);
     if (stmtDecl == NULL)
       continue;
 
-    const IrValueSymbol* declSymbol = dynamic_cast<const IrValueSymbol*>(stmtDecl->value.get());
+    const IrValueSymbol* declSymbol = dynamic_cast<const IrValueSymbol*>(stmtDecl->value);
     if (declSymbol && declSymbol->id == symbol.id)
       return stmtDecl;
   }
@@ -30,7 +30,7 @@ static const IrStmtDeclaration* getFuncDecl(const IrHolder& holder, const IrValu
 
 static const IrStmtFunction* getFuncDef(const IrHolder& holder, const IrValueSymbol& symbol) {
   for (const IrStmt& stmt : holder.data) {
-    const IrStmtFunction* stmtFunDef = dynamic_cast<const IrStmtFunction*>(stmt.get());
+    const IrStmtFunction* stmtFunDef = dynamic_cast<const IrStmtFunction*>(stmt);
     if (stmtFunDef && stmtFunDef->id.id == symbol.id)
       return stmtFunDef;
   }
@@ -50,13 +50,13 @@ const std::vector<IrAnalysisResult> IrAnalyzer::analyzeHolder() const {
 }
 
 const IrAnalysisResult IrAnalyzer::analyzeIrStmt(const IrStmt& stmt) const {
-  if (const IrStmtAssign* irAssign = dynamic_cast<const IrStmtAssign*>(stmt.get()))
+  if (const IrStmtAssign* irAssign = dynamic_cast<const IrStmtAssign*>(stmt))
     return analyzeIrStmtAssign(*irAssign);
-  else if (const IrStmtDeclaration* irDecl = dynamic_cast<const IrStmtDeclaration*>(stmt.get()))
+  else if (const IrStmtDeclaration* irDecl = dynamic_cast<const IrStmtDeclaration*>(stmt))
     return analyzeIrStmtDeclaration(*irDecl);
-  else if (const IrStmtFunction* irFunc = dynamic_cast<const IrStmtFunction*>(stmt.get()))
+  else if (const IrStmtFunction* irFunc = dynamic_cast<const IrStmtFunction*>(stmt))
     return analyzeIrStmtFunction(*irFunc);
-  else if (const IrStmtInstruction* irInsn = dynamic_cast<const IrStmtInstruction*>(stmt.get()))
+  else if (const IrStmtInstruction* irInsn = dynamic_cast<const IrStmtInstruction*>(stmt))
     return analyzeIrStmtInstruction(*irInsn);
 
   SIRF_UNREACHABLE();
@@ -70,7 +70,7 @@ const IrAnalysisResult IrAnalyzer::analyzeIrStmtAssign(const IrStmtAssign& irAss
 }
 
 const IrAnalysisResult IrAnalyzer::analyzeIrStmtDeclaration(const IrStmtDeclaration& irDecl) const {
-  const IrValueSymbol* symbol = dynamic_cast<const IrValueSymbol*>(irDecl.value.get());
+  const IrValueSymbol* symbol = dynamic_cast<const IrValueSymbol*>(irDecl.value);
   if (symbol == NULL)
     return {RES_ERROR, "declaration must be a symbol"};
 
@@ -93,13 +93,13 @@ const IrAnalysisResult IrAnalyzer::analyzeIrStmtInstruction(const IrStmtInstruct
     const IrValue& dst = irInsn.ops.at(0);
     const IrValue& src = irInsn.ops.at(1);
 
-    if (!isInstanceOf<IrValueBase, IrValueRegister>(dst.get()))
+    if (!isInstanceOf<IrValueBase, IrValueRegister>(dst))
       return {RES_ERROR, "mov instruction operand 0 must be a register"};
 
     // clang-format off
-    if (!isInstanceOf<IrValueBase, IrValueRegister>(src.get())
-      && !isInstanceOf<IrValueBase, IrValueSSA>(src.get())
-      && !isInstanceOf<IrValueBase, IrValueLiteral>(src.get())) // clang-format on
+    if (!isInstanceOf<IrValueBase, IrValueRegister>(src)
+      && !isInstanceOf<IrValueBase, IrValueSSA>(src)
+      && !isInstanceOf<IrValueBase, IrValueLiteral>(src)) // clang-format on
       return {RES_ERROR, "mov instruction operand 1 must be a register, literal or SSA"};
   }
   else if (irInsn.op == IrOpCode::LOAD) {
@@ -109,10 +109,10 @@ const IrAnalysisResult IrAnalyzer::analyzeIrStmtInstruction(const IrStmtInstruct
     const IrValue& dst = irInsn.ops.at(0);
     const IrValue& src = irInsn.ops.at(1);
 
-    if (!isInstanceOf<IrValueBase, IrValueRegister>(dst.get()))
+    if (!isInstanceOf<IrValueBase, IrValueRegister>(dst))
       return {RES_ERROR, "load instruction operand 0 must be a register"};
 
-    if (!isInstanceOf<IrValueBase, IrValuePtr>(src.get()))
+    if (!isInstanceOf<IrValueBase, IrValueLabel>(src) && !isInstanceOf<IrValueBase, IrValueSymbol>(src))
       return {RES_ERROR, "load instruction operand 1 must be a pointer"};
   }
   else if (irInsn.op == IrOpCode::STORE) {
@@ -121,12 +121,7 @@ const IrAnalysisResult IrAnalyzer::analyzeIrStmtInstruction(const IrStmtInstruct
 
     const IrValue& dst = irInsn.ops.at(0);
     const IrValue& src = irInsn.ops.at(1);
-
-    if (!isInstanceOf<IrValueBase, IrValuePtr>(dst.get()))
-      return {RES_ERROR, "store instruction operand 0 must be a register, literal or SSA"};
-
-    if (!isInstanceOf<IrValueBase, IrValueRegister>(src.get()))
-      return {RES_ERROR, "store instruction operand 1 must be a pointer"};
+    // TODO
   }
   else if (irInsn.op == IrOpCode::ADD) {
   }
@@ -135,7 +130,7 @@ const IrAnalysisResult IrAnalyzer::analyzeIrStmtInstruction(const IrStmtInstruct
       return {RES_ERROR, "call instruction must provide operand 0"};
 
     const IrValue& callee = irInsn.ops.front();
-    const IrValueSymbol* symbol = dynamic_cast<const IrValueSymbol*>(callee.get());
+    const IrValueSymbol* symbol = dynamic_cast<const IrValueSymbol*>(callee);
     const IrStmtDeclaration* funDecl = getFuncDecl(holder, *symbol);
     if (funDecl == NULL)
       return {RES_ERROR, "callee symbol not declared"};
