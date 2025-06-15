@@ -6,6 +6,7 @@
 
 #include "Common.hpp"
 #include "IrTypeBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -16,8 +17,8 @@ public:
   explicit IrTypePtr(IrType&& type)
     : type(std::move(type)) {}
 
-  static inline IrType newType(IrType&& type) {
-    return std::make_shared<IrTypePtr>(std::move(type));
+  static inline IrType make(ArenaAllocator& al, IrType&& type) {
+    return al.emplace<IrTypePtr>(std::move(type));
   }
 
   std::string toString() const override;

@@ -7,7 +7,6 @@
 #include "IrValueBase.hpp"
 #include "IrValueLabel.hpp"
 #include "IrValueLiteral.hpp"
-#include "IrValuePtr.hpp"
 #include "IrValueRegister.hpp"
 #include "IrValueSSA.hpp"
 #include "IrValueSymbol.hpp"

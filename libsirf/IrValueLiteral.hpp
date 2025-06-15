@@ -7,6 +7,7 @@
 #include "Common.hpp"
 #include "IrTypeBase.hpp"
 #include "IrValueBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -19,8 +20,8 @@ public:
     : type(type),
       value(val) {}
 
-  static inline IrValue newValue(IrType type, uint64_t val) {
-    return std::make_shared<IrValueLiteral>(type, val);
+  static inline IrValue make(ArenaAllocator& al, IrType type, uint64_t val) {
+    return al.emplace<IrValueLiteral>(type, val);
   }
 
   bool isSigned() const;

@@ -6,6 +6,7 @@
 
 #include "Common.hpp"
 #include "IrTypeBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -25,8 +26,8 @@ public:
   explicit IrTypeNamed(IrNamedTypeKind kind)
     : kind(kind) {}
 
-  static inline IrType newType(IrNamedTypeKind kind) {
-    return std::make_shared<IrTypeNamed>(kind);
+  static inline IrType make(ArenaAllocator& al, IrNamedTypeKind kind) {
+    return al.emplace<IrTypeNamed>(kind);
   }
 
   std::string toString() const override;

@@ -27,7 +27,7 @@ static std::string getOpcodeName(IrOpCode op) {
 }
 
 static bool isReturnRegister(const IrValue& val) {
-  if SIRF_CHECKVIRT (IrValueRegister, reg, val.get()) {
+  if SIRF_CHECKVIRT (IrValueRegister, reg, val) {
     // r0/x0 corresponds to rax/eax respectively, which are the return registers in the SYSV ABI calling convention
     return reg->id == 0;
   }
@@ -104,8 +104,8 @@ ValueRepr AsmGenerator::generateVariable_x86_64(const IrValueSSA& var) {
 }
 
 void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
-  if SIRF_CHECKVIRT (IrStmtDeclaration, decl, stat.get()) {
-    if SIRF_CHECKVIRT (IrValueSymbol, sym, decl->value.get()) {
+  if SIRF_CHECKVIRT (IrStmtDeclaration, decl, stat) {
+    if SIRF_CHECKVIRT (IrValueSymbol, sym, decl->value) {
       switch (decl->kind) {
       case IrDeclKind::EXTERN:
         section_text << "extern " << sym->id << "\n";
@@ -117,7 +117,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       }
     }
   }
-  else if SIRF_CHECKVIRT (IrStmtFunction, fun, stat.get()) {
+  else if SIRF_CHECKVIRT (IrStmtFunction, fun, stat) {
     section_text << fun->id.id << ":\n";
     section_text << "  push rbp\n";
     section_text << "  mov rbp, rsp\n";
@@ -141,7 +141,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
     section_text << "  leave\n";
     section_text << "  ret\n";
   }
-  else if SIRF_CHECKVIRT (IrStmtInstruction, insn, stat.get()) {
+  else if SIRF_CHECKVIRT (IrStmtInstruction, insn, stat) {
     using enum IrOpCode;
 
     switch (insn->op) {
@@ -162,10 +162,10 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       const IrValue& dst = insn->ops[0];
       const IrValue& size = insn->ops[1];
 
-      if SIRF_CHECKVIRT (IrValueSSA, ssa, dst.get()) {
+      if SIRF_CHECKVIRT (IrValueSSA, ssa, dst) {
         auto& currentMap = stackMap.back();
 
-        if SIRF_CHECKVIRT (IrValueLiteral, lit, size.get()) {
+        if SIRF_CHECKVIRT (IrValueLiteral, lit, size) {
           const size_t size = lit->value;
           const size_t offset = alloca_x86_64(size);
           currentMap[ssa->id] = {variable, {.var = {offset, size}}};
@@ -187,7 +187,7 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
         goto no_strength_reduction;
       }
 
-      if SIRF_CHECKVIRT (IrValueLiteral, lit, insn->ops[1].get()) {
+      if SIRF_CHECKVIRT (IrValueLiteral, lit, insn->ops[1]) {
         // check whether if it is positive and is a power of 2
         if (lit->value <= 0 || (lit->value & (lit->value - 1)) != 0) {
           goto no_strength_reduction;
@@ -206,9 +206,9 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
       break;
     }
   }
-  else if SIRF_CHECKVIRT (IrStmtLabel, lb, stat.get())
+  else if SIRF_CHECKVIRT (IrStmtLabel, lb, stat)
     section_text << lb->label.id << ":\n";
-  else if SIRF_CHECKVIRT (IrStmtAssign, as, stat.get()) {
+  else if SIRF_CHECKVIRT (IrStmtAssign, as, stat) {
     ValueRepr lval = generateValue_x86_64(as->lvalue);
     ValueRepr rval = generateValue_x86_64(as->rvalue);
     generateBinaryInstruction_x86_64("mov", lval, rval);
@@ -218,11 +218,11 @@ void AsmGenerator::generateStmt_x86_64(const IrStmt& stat) {
 }
 
 ValueRepr AsmGenerator::generateValue_x86_64(const IrValue& val) {
-  if SIRF_CHECKVIRT (IrValueLiteral, lit, val.get())
-    return {false, std::to_string(lit->value), val.get()};
-  else if SIRF_CHECKVIRT (IrValueRegister, reg, val.get())
+  if SIRF_CHECKVIRT (IrValueLiteral, lit, val)
+    return {false, std::to_string(lit->value), val};
+  else if SIRF_CHECKVIRT (IrValueRegister, reg, val)
     return generateRegister_x86_64(*reg);
-  else if SIRF_CHECKVIRT (IrValueSSA, ssa, val.get())
+  else if SIRF_CHECKVIRT (IrValueSSA, ssa, val)
     return generateVariable_x86_64(*ssa);
 
   SIRF_UNREACHABLE();

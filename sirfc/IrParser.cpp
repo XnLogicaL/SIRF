@@ -3,6 +3,7 @@
 // Copyright (C) 2025 XnLogical - Licensed under GNU GPL v3.0
 
 #include "IrParser.hpp"
+#include "IrStmtData.hpp"
 
 namespace sirf {
 
@@ -75,11 +76,18 @@ IrValue IrParser::parseValue() {
   Token token = peek(0);
 
   switch (token.kind) {
+  case DOT: {
+    // .label
+    consume();
+    Token nameTok = consume();
+    return IrValueLabel::make(state.al, nameTok.lexeme);
+  }
+
   case AT: {
     // @symbol
     consume();
     Token nameTok = consume();
-    return IrValueSymbol::newValue(nameTok.lexeme);
+    return IrValueSymbol::make(state.al, nameTok.lexeme);
   }
 
   case PERCENT: {
@@ -87,7 +95,7 @@ IrValue IrParser::parseValue() {
     consume();
     Token nameTok = consume();
     if (nameTok.kind == LIT_INT)
-      return IrValueSSA::newValue(std::stoull(nameTok.lexeme));
+      return IrValueSSA::make(state.al, std::stoull(nameTok.lexeme));
     else {
       auto [line, off] = translateOffset(state.inputSource, nameTok.loc);
       throw IrParserException(line, off, "SSA variables with non-integer identifiers are currently not supported");
@@ -123,7 +131,7 @@ IrValue IrParser::parseValue() {
 
     if (bitWidth != 0) {
       uint64_t undef; // used for undefined initialization
-      IrType type = IrTypeSized::newType(isSigned, bitWidth);
+      IrType type = IrTypeSized::make(state.al, isSigned, bitWidth);
 
       if (peek(0).kind == LIT_INT) {
         // We have a proper "iN" or "uN" followed by a literal token.
@@ -135,10 +143,10 @@ IrValue IrParser::parseValue() {
         catch (...) {
           throwUnexpectedToken(state.inputSource, litTok.loc, "invalid integer literal '{}'", litTok.lexeme);
         }
-        return IrValueLiteral::newValue(type, intValue);
+        return IrValueLiteral::make(state.al, type, intValue);
       }
 
-      return IrValueLiteral::newValue(type, undef);
+      return IrValueLiteral::make(state.al, type, undef);
     }
 
     // Not a literal after iN/uN. Reset position to parse as register.
@@ -155,7 +163,7 @@ IrValue IrParser::parseValue() {
       catch (...) {
         throwUnexpectedToken(state.inputSource, regTok.loc, "invalid register id '{}'", regLex);
       }
-      return IrValueRegister::newValue(regId, IrRegisterKind::QWORD);
+      return IrValueRegister::make(state.al, regId, IrRegisterKind::QWORD);
     }
 
     // If we reach here, it's neither a sized‐literal nor a register.
@@ -188,7 +196,7 @@ IrType IrParser::parseType() {
       if (bitWidth % 8 != 0)
         throwUnexpectedToken(state.inputSource, token.loc, "sized types must be 8-bit aligned");
 
-      return IrTypeSized::newType(isSigned, bitWidth);
+      return IrTypeSized::make(state.al, isSigned, bitWidth);
     }
     break;
   }
@@ -196,7 +204,7 @@ IrType IrParser::parseType() {
   case CARET: {
     // ^<type>
     IrType pointee = parseType();
-    return IrTypePtr::newType(std::move(pointee));
+    return IrTypePtr::make(state.al, std::move(pointee));
   }
 
   default:
@@ -212,12 +220,34 @@ IrStmt IrParser::parseStmt() {
   switch (token.kind) {
   case KW_GLOBAL:
     consume();
-    return IrStmtDeclaration::newStmt(IrDeclKind::GLOBAL, parseValue());
+    return IrStmtDeclaration::make(state.al, IrDeclKind::GLOBAL, parseValue());
   case KW_EXTERN:
     consume();
-    return IrStmtDeclaration::newStmt(IrDeclKind::EXTERN, parseValue());
+    return IrStmtDeclaration::make(state.al, IrDeclKind::EXTERN, parseValue());
 
   case KW_DATA: {
+    consume();
+    assertConsume(DOT);
+    Token id = assertConsume(IDENT);
+    assertConsume(COLON);
+
+    DataBuf buf;
+
+    while (true) {
+      Token tok = consume();
+      if (tok.kind == LIT_INT) {
+        buf.push_back(std::stoi(tok.lexeme));
+      }
+
+      Token next = peek(0);
+      if (next.kind != COMMA) {
+        break;
+      }
+
+      consume();
+    }
+
+    return IrStmtData::make(state.al, IrValueLabel(id.lexeme), std::move(buf));
   }
 
   case KW_FUN: {
@@ -225,9 +255,8 @@ IrStmt IrParser::parseStmt() {
 
     // fun <retType> @<symbol> ( params ) <scope>
     IrType returnType = parseType();
-
     IrValue maybeSym = parseValue();
-    IrValueSymbol* symbol = dynamic_cast<IrValueSymbol*>(maybeSym.get());
+    IrValueSymbol* symbol = dynamic_cast<IrValueSymbol*>(maybeSym);
     if (!symbol) {
       auto [line, col] = translateOffset(state.inputSource, peek(0).loc);
       throw IrParserException(line, col, "Expected function name symbol");
@@ -238,7 +267,7 @@ IrStmt IrParser::parseStmt() {
     std::vector<IrParameter> params;
     while (peek(0).kind != PAREN_CLOSE) {
       IrValue paramName = parseValue();
-      IrValueSSA* ssaName = dynamic_cast<IrValueSSA*>(paramName.get());
+      IrValueSSA* ssaName = dynamic_cast<IrValueSSA*>(paramName);
       if (!ssaName) {
         auto [line, col] = translateOffset(state.inputSource, peek(0).loc);
         throw IrParserException(line, col, "Expected SSA name in parameter list");
@@ -253,7 +282,8 @@ IrStmt IrParser::parseStmt() {
     assertConsume(PAREN_CLOSE);
 
     IrScope bodyScope = parseScope();
-    return IrStmtFunction::newStmt(
+    return IrStmtFunction::make(
+      state.al,
       std::move(returnType),
       *symbol,
       std::move(params),
@@ -266,7 +296,7 @@ IrStmt IrParser::parseStmt() {
     IrValue lval = parseValue();
     assertConsume(EQUALS);
     IrValue rval = parseValue();
-    return IrStmtAssign::newStmt(lval, rval);
+    return IrStmtAssign::make(state.al, lval, rval);
   }
 
   case IDENT: {
@@ -289,7 +319,7 @@ IrStmt IrParser::parseStmt() {
         break;
     } while (true);
 
-    return IrStmtInstruction::newStmt(*maybeOp, std::move(operands));
+    return IrStmtInstruction::make(state.al, *maybeOp, std::move(operands));
   }
 
   default:

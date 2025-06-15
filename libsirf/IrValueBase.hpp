@@ -17,7 +17,7 @@ public:
   virtual std::string toString() const = 0;
 };
 
-using IrValue = std::shared_ptr<IrValueBase>;
+using IrValue = IrValueBase*;
 
 } // namespace sirf
 

@@ -6,6 +6,7 @@
 
 #include "Common.hpp"
 #include "IrValueBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -25,8 +26,8 @@ public:
     : id(id),
       kind(kind) {}
 
-  static IrValue newValue(uint32_t id, IrRegisterKind kind) {
-    return std::make_shared<IrValueRegister>(id, kind);
+  static IrValue make(ArenaAllocator& al, uint32_t id, IrRegisterKind kind) {
+    return al.emplace<IrValueRegister>(id, kind);
   }
 
   /// Returns whether if the Ir value can be interpreted as an lvalue

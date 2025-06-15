@@ -6,6 +6,7 @@
 
 #include "Common.hpp"
 #include "IrTypeBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -18,8 +19,8 @@ public:
     : isSigned(isSigned),
       size(size) {}
 
-  static inline IrType newType(bool isSigned, uint64_t size) {
-    return std::make_shared<IrTypeSized>(isSigned, size);
+  static inline IrType make(ArenaAllocator& al, bool isSigned, uint64_t size) {
+    return al.emplace<IrTypeSized>(isSigned, size);
   }
 
   std::string toString() const override;

@@ -13,7 +13,7 @@ public:
   virtual std::string toString() const = 0;
 };
 
-using IrStmt = std::shared_ptr<IrStmtBase>;
+using IrStmt = IrStmtBase*;
 using IrScope = std::vector<IrStmt>;
 
 } // namespace sirf

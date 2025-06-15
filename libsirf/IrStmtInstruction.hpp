@@ -7,6 +7,7 @@
 #include "Common.hpp"
 #include "IrValueBase.hpp"
 #include "IrStmtBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -20,8 +21,6 @@ enum class IrOpCode {
   SUB,
   MUL,
   DIV,
-  RSP,
-  SSP,
   CALL,
   RET,
   JMP,
@@ -40,8 +39,8 @@ public:
     : op(op),
       ops(std::move(ops)) {}
 
-  static inline IrStmt newStmt(IrOpCode op, IrOperands&& ops) {
-    return std::make_shared<IrStmtInstruction>(op, std::move(ops));
+  static inline IrStmt make(ArenaAllocator& al, IrOpCode op, IrOperands&& ops) {
+    return al.emplace<IrStmtInstruction>(op, std::move(ops));
   }
 
   std::string toString() const override;

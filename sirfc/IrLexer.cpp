@@ -196,6 +196,8 @@ Token IrLexer::nextToken() {
   CHR_CASE(',', COMMA)
   CHR_CASE('@', AT)
   CHR_CASE('=', EQUALS)
+  CHR_CASE(':', COLON)
+  CHR_CASE('.', DOT)
 #undef CHR_CASE
   default:
     break;

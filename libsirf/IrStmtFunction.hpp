@@ -11,6 +11,7 @@
 #include "IrTypeBase.hpp"
 #include "IrStmtBase.hpp"
 #include "IrValueBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -40,12 +41,15 @@ public:
       attribs(atts),
       body(body) {}
 
-  inline static IrStmt newStmt(
-    IrType ret, IrValueSymbol id, std::vector<IrParameter> pars, std::vector<IrAttribute> atts, IrScope body
+  inline static IrStmt make(
+    ArenaAllocator& al,
+    IrType ret,
+    IrValueSymbol id,
+    std::vector<IrParameter> pars,
+    std::vector<IrAttribute> atts,
+    IrScope body
   ) {
-    return std::make_shared<IrStmtFunction>(
-      std::move(ret), std::move(id), std::move(pars), std::move(atts), std::move(body)
-    );
+    return al.emplace<IrStmtFunction>(std::move(ret), std::move(id), std::move(pars), std::move(atts), std::move(body));
   }
 
   std::string toString() const override;

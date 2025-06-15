@@ -6,6 +6,7 @@
 
 #include "Common.hpp"
 #include "IrValueBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -15,6 +16,10 @@ public:
 
   explicit IrValueLabel(std::string id)
     : id(id) {}
+
+  static IrValue make(ArenaAllocator& al, std::string id) {
+    return al.emplace<IrValueLabel>(id);
+  }
 
   /// Returns whether if the Ir value can be interpreted as an lvalue
   constexpr bool isLvalue() const override;

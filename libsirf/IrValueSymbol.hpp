@@ -6,6 +6,7 @@
 
 #include "Common.hpp"
 #include "IrValueBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -16,8 +17,8 @@ public:
   explicit IrValueSymbol(std::string id)
     : id(id) {}
 
-  static inline IrValue newValue(std::string id) {
-    return std::make_shared<IrValueSymbol>(id);
+  static inline IrValue make(ArenaAllocator& al, std::string id) {
+    return al.emplace<IrValueSymbol>(id);
   }
 
   /// Returns whether if the Ir value can be interpreted as an lvalue

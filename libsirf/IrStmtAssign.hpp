@@ -8,6 +8,7 @@
 #include "IrValueBase.hpp"
 #include "IrValueSSA.hpp"
 #include "IrStmtBase.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -20,8 +21,8 @@ public:
     : lvalue(lvalue),
       rvalue(rvalue) {}
 
-  inline static IrStmt newStmt(IrValue lvalue, IrValue rvalue) {
-    return std::make_shared<IrStmtAssign>(std::move(lvalue), std::move(rvalue));
+  inline static IrStmt make(ArenaAllocator& al, IrValue lvalue, IrValue rvalue) {
+    return al.emplace<IrStmtAssign>(std::move(lvalue), std::move(rvalue));
   }
 
   std::string toString() const override;

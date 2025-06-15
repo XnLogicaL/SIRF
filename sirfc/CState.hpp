@@ -6,6 +6,7 @@
 
 #include "Common.hpp"
 #include "IrHolder.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -16,6 +17,7 @@ struct CState {
   int exitCode = 0;
   IrHolder irHolder;
   TokenHolder tokHolder;
+  ArenaAllocator al{1024 * 1024 * 8};
   std::string inputPath;
   std::string inputSource;
   std::string outputPath;

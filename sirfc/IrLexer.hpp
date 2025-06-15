@@ -21,6 +21,8 @@ enum class TokenKind {
   CARET,
   COMMA,
   EQUALS,
+  COLON,
+  DOT,
   AT,
 
   IDENT,

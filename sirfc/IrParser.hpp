@@ -4,13 +4,13 @@
 #ifndef SIRFC_IRPARSER_HPP
 #define SIRFC_IRPARSER_HPP
 
-#include <magic_enum/magic_enum.hpp>
-#include <spdlog/spdlog.h>
 #include "IrValues.hpp"
 #include "IrTypes.hpp"
 #include "IrStmts.hpp"
 #include "IrLexer.hpp"
 #include "CState.hpp"
+#include <magic_enum/magic_enum.hpp>
+#include <spdlog/spdlog.h>
 
 namespace sirf {
 

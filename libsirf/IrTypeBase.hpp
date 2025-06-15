@@ -13,7 +13,7 @@ public:
   virtual std::string toString() const = 0;
 };
 
-using IrType = std::shared_ptr<IrTypeBase>;
+using IrType = IrTypeBase*;
 
 } // namespace sirf
 

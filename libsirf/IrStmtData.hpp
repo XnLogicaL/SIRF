@@ -7,6 +7,7 @@
 #include "Common.hpp"
 #include "IrStmtBase.hpp"
 #include "IrValueLabel.hpp"
+#include <arena/arena.h>
 
 namespace sirf {
 
@@ -22,8 +23,8 @@ public:
     : id(std::move(id)),
       buf(std::move(buf)) {}
 
-  inline static IrStmt newStmt(IrValueLabel&& id, DataBuf&& buf) {
-    return std::make_shared<IrStmtData>(std::move(id), std::move(buf));
+  inline static IrStmt make(ArenaAllocator& al, IrValueLabel&& id, DataBuf&& buf) {
+    return al.emplace<IrStmtData>(std::move(id), std::move(buf));
   }
 
   std::string toString() const override;
