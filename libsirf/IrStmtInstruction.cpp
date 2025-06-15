@@ -32,8 +32,6 @@ std::string toString(IrOpCode opcode) {
   case SUB:   return "sub";
   case MUL:   return "mul";
   case DIV:   return "div";
-  case RSP:   return "rsp";
-  case SSP:   return "ssp";
   case CALL:  return "call";
   case RET:   return "ret";
   case JMP:   return "jmp";
