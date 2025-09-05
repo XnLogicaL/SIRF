@@ -1,0 +1,9 @@
+[package]
+name = "sirf_parser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bumpalo = { workspace = true }
+sirf_core = { path = "../sirf_core" }
+sirf_utils = { path = "../sirf_utils" }

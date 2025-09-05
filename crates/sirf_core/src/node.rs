@@ -1,0 +1,13 @@
+/* ================================================== **
+**  SIRF - Simple Intermediate Representation Format  **
+** -------------------------------------------------- **
+**          Copyright (C) XnLogicaL 2025              **
+**           Licensed under GNU GPLv3.0               **
+** -------------------------------------------------- **
+**        https://github.com/XnLogicaL/SIRF           **
+** ================================================== */
+
+#[allow(dead_code)]
+pub trait Node {
+    fn to_repr(&self) -> String;
+}

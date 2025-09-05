@@ -1,0 +1,12 @@
+[workspace]
+resolver = "1"
+members = [
+  "crates/sirf_core",
+  "crates/sirf_builder",
+  "crates/sirf_codegen",
+  "crates/sirf_cli",
+  "crates/sirf_utils", "crates/sirf_parser",
+]
+
+[workspace.dependencies]
+bumpalo = "3.19.0"
