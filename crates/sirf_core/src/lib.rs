@@ -8,12 +8,10 @@
 ** ================================================== */
 
 pub mod diagnostics;
+pub mod expression;
+mod intern_table;
 pub mod module;
-
-mod expr;
 mod node;
-
-pub mod ir {
-    pub use crate::expr::*;
-    pub use crate::node::*;
-}
+pub mod statement;
+mod symbol_table;
+pub mod types;

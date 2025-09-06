@@ -7,7 +7,14 @@
 **        https://github.com/XnLogicaL/SIRF           **
 ** ================================================== */
 
-#[allow(dead_code)]
-pub trait Repr {
-    fn to_repr(&self) -> String;
+use crate::intern_table::InternTable;
+use lazy_static::lazy_static;
+use std::sync::{Mutex, MutexGuard};
+
+lazy_static! {
+    static ref SYMBOL_TABLE: Mutex<InternTable> = Mutex::new(InternTable::new());
+}
+
+pub fn get_symbol_table() -> MutexGuard<'static, InternTable> {
+    SYMBOL_TABLE.lock().unwrap()
 }

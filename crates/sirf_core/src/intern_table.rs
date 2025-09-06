@@ -7,7 +7,24 @@
 **        https://github.com/XnLogicaL/SIRF           **
 ** ================================================== */
 
-#[allow(dead_code)]
-pub trait Repr {
-    fn to_repr(&self) -> String;
+use std::collections::HashMap;
+
+pub struct InternTable {
+    map: HashMap<String, Box<str>>,
+}
+
+impl InternTable {
+    pub fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+        }
+    }
+
+    pub fn intern(&mut self, s: &str) -> &str {
+        let entry = self
+            .map
+            .entry(s.to_string())
+            .or_insert_with(|| s.to_string().into_boxed_str());
+        entry
+    }
 }

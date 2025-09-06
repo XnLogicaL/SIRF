@@ -1,0 +1,45 @@
+{
+	"schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "sirf",
+	"scopeName": "source.sirf",
+	"patterns": [
+		{
+			"name": "comment.line.double-slash.sirf",
+			"match": "//.*$"
+		},
+		{
+			"name": "comment.block.sirf",
+			"begin": "/\\*",
+			"end": "\\*/",
+			"patterns": [
+				{
+					"match": "/\\*",
+					"name": "invalid.illegal.nested-comment.sirf"
+				}
+			]
+		},
+		{
+			"name": "keyword.control.sirf",
+			"match": "\\b(global|data|function)\\b"
+		},
+		{
+			"name": "constant.numeric.sirf",
+			"match": "\\b(\\d+(\\.\\d*)?|\\.\\d+)([eE][+-]?\\d+)?\\b"
+		},
+		{
+			"name": "keyword.operator.assignment.sirf",
+			"match": "="
+		},
+		{
+			"name": "string.quoted.double.sirf",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.sirf",
+					"match": "\\\\."
+				}
+			]
+		}
+	]
+}

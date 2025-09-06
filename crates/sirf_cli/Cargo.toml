@@ -6,4 +6,6 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.5.47", features = ["derive"] }
 clio = { version = "0.3.5", features = ["clap-parse"] }
+bumpalo = { workspace = true }
 sirf_core = { path = "../sirf_core" }
+sirf_parser = { path = "../sirf_parser" }

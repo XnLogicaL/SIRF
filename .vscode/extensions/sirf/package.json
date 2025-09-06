@@ -1,0 +1,25 @@
+{
+  "name": "sirf",
+  "displayName": "sirf",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "sirf",
+      "aliases": ["sirf", "sirf"],
+      "extensions": [".sirf"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "sirf",
+      "scopeName": "",
+      "path": "./syntaxes/sirf.tmLanguage.json"
+    }]
+  }
+}

@@ -7,7 +7,5 @@
 **        https://github.com/XnLogicaL/SIRF           **
 ** ================================================== */
 
-mod lexer;
-mod parser;
-
-pub use crate::parser::parse_file;
+pub mod lexer;
+pub mod parser;

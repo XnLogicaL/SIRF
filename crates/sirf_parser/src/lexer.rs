@@ -10,7 +10,7 @@
 use bumpalo::Bump;
 use sirf_core::diagnostics::SourceLoc;
 use sirf_core::module::Module;
-use std::io::{Cursor, Read};
+use std::fmt;
 
 #[derive(Debug, Clone, Copy)]
 pub enum TokenKind {}
@@ -31,6 +31,31 @@ impl<'a> Token<'a> {
 #[derive(Debug)]
 pub struct Lexer<'a> {
     arena: &'a mut Bump,
-    module: &'a Module,
-    cursor: Cursor<u8>,
+    source: &'a [u8],
+    cursor: usize,
+}
+
+impl<'a> Lexer<'a> {
+    pub fn new(arena: &'a mut Bump, module: &'a Module) -> Self {
+        let source = module.source.as_ref();
+        Self {
+            arena,
+            source,
+            cursor: 0,
+        }
+    }
+
+    pub fn tokenize(&mut self) -> Vec<Token<'a>> {
+        vec![]
+    }
+
+    fn peek(&self, ahead: usize) -> u8 {
+        self.source.get(self.cursor + ahead).copied().unwrap_or(0)
+    }
+
+    fn advance(&mut self, ahead: usize) -> u8 {
+        let byte = self.peek(0);
+        self.cursor += ahead.max(1);
+        byte
+    }
 }
